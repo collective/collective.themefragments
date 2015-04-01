@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from plone.app.robotframework.testing import AUTOLOGIN_LIBRARY_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.testing import z2
 
 
 class CollectiveThemeFragmentsLayer(PloneSandboxLayer):
@@ -29,8 +27,3 @@ COLLECTIVE_THEMEFRAGMENTS_INTEGRATION_TESTING = IntegrationTesting(
 COLLECTIVE_THEMEFRAGMENTS_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(COLLECTIVE_THEMEFRAGMENTS_FIXTURE,),
     name='Functional')
-COLLECTIVE_THEMEFRAGMENTS_ROBOT_TESTING = FunctionalTesting(
-    bases=(AUTOLOGIN_LIBRARY_FIXTURE,
-           COLLECTIVE_THEMEFRAGMENTS_FIXTURE,
-           z2.ZSERVER_FIXTURE),
-    name='Robot')
