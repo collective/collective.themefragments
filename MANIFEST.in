@@ -1,0 +1,3 @@
+recursive-include src *
+include *.rst *.py
+global-exclude *.pyc
