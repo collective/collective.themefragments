@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+from plone.app.robotframework.testing import AUTOLOGIN_LIBRARY_FIXTURE
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PLONE_FIXTURE
+from plone.app.testing import PloneSandboxLayer
+from plone.testing import z2
+
+
+class CollectiveThemeFragmentsLayer(PloneSandboxLayer):
+    defaultBases = (PLONE_FIXTURE,)
+
+    def setUpZope(self, app, configurationContext):
+        import collective.themefragments
+        import collective.themefragments.tests
+        self.loadZCML(package=collective.themefragments)
+        self.loadZCML(package=collective.themefragments.tests)
+
+    def setUpPloneSite(self, portal):
+        self.applyProfile(portal, 'plone.app.theming:default')
+
+
+COLLECTIVE_THEMEFRAGMENTS_FIXTURE =\
+    CollectiveThemeFragmentsLayer()
+
+COLLECTIVE_THEMEFRAGMENTS_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(COLLECTIVE_THEMEFRAGMENTS_FIXTURE,),
+    name='Integration')
+COLLECTIVE_THEMEFRAGMENTS_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(COLLECTIVE_THEMEFRAGMENTS_FIXTURE,),
+    name='Functional')
+COLLECTIVE_THEMEFRAGMENTS_ROBOT_TESTING = FunctionalTesting(
+    bases=(AUTOLOGIN_LIBRARY_FIXTURE,
+           COLLECTIVE_THEMEFRAGMENTS_FIXTURE,
+           z2.ZSERVER_FIXTURE),
+    name='Robot')

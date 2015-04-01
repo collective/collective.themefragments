@@ -1,0 +1,15 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="collective.themefragments">
+
+  <!-- Theme traverser -->
+  <browser:page
+      name="theme-fragment"
+      for="*"
+      layer="plone.app.theming.interfaces.IThemingLayer"
+      class=".traversal.ThemeFragment"
+      permission="zope.Public"
+      />
+
+</configure>
