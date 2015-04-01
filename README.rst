@@ -1,6 +1,9 @@
 Theme Fragments for `Plone Themes`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. image:: https://secure.travis-ci.org/datakurre/collective.themefragments.png
+   :target: https://travis-ci.org/datakurre/collective.themefragments
+
 .. _Plone Themes: https://pypi.python.org/pypi/plone.app.theming
 
 Diazo Rules may operate on content that is fetched from somewhere other than
