@@ -69,11 +69,67 @@ fragment:
 You can learn more about Zope Page Template syntax
 `here <http://plone.org/documentation/tutorial/zpt/>`_.
 
+Fragment methods
+++++++++++++++++
+
+Fragment methods are Restricted Python Script files bundled with your themes.
+Availability of methods is limited to specific fragment by prefixing the
+method filename with the fragment name. Each script should contain code
+for a single method and end by returning a value for the template.
+
+For example, you could create a file ``fragments/customnav.getnav.py`` in your
+theme directory, containing:
+
+   return [{
+       'Title': u'My title',
+       'Description': u'My description',
+       'getIcon': 'document_icon.png'
+   }]
+
+And call it in your fragment ``fragments/customnav.pt`` like a view method::
+
+  <ul id="nav">
+    <li tal:repeat="item view/getnav">
+      <img tal:replace="structure item/getIcon" />
+      <span tal:replace="item/Title" tal:attributes="titile item/Description">Title</span>
+    </li>
+  </ul>
+
+The following variables are available to the fragment method kkkkkkkused to build a
+fragment:
+
+``self``
+  The fragment view, which provides access to ``self.context``,
+  ``self.request`` and other available fragment methods similarly to
+  filesystem browser views.
+
+``args``
+  List of positional arguments for the method call.
+  *Fragment methods do not support Zope PythonScript's way of defining
+  positional named arguments.*
+
+``kwargs``
+  Dictionary of keyword arguments for the method call.
+  *Fragment methods do not support Zope PythonScript's way of defining
+  named keyword arguments.*
+
+``context``
+  The context in which the fragment was looked up.
+  *This is provided as tribute to Zope PythonScript.*
+
+``container``
+  The container for the context which the fragment was looked up.
+  *This is provided as tribute to Zope PythonScript.*
+
+``traverse_subpath``
+  An empty string.
+  *This is provided as tribute to Zope PythonScript.*
+
 Rendering fragments
 +++++++++++++++++++
 
 The special ``@@theme-fragment`` view is used to render fragments. Before
-using it in your theme, you can test it directlry in your browser by going to
+using it in your theme, you can test it directly in your browser by going to
 a URL like::
 
   http://localhost:8080/Plone/@@theme-fragment/customnav

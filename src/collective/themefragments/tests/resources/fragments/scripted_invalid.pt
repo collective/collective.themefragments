@@ -1,0 +1,3 @@
+<div id="nav">
+    <h2 tal:content="view/owner">Should not work in restricted python</h2>
+</div>
