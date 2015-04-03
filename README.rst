@@ -78,7 +78,7 @@ method filename with the fragment name. Each script should contain code
 for a single method and end by returning a value for the template.
 
 For example, you could create a file ``fragments/customnav.getnav.py`` in your
-theme directory, containing:
+theme directory, containing::
 
    return [{
        'Title': u'My title',
