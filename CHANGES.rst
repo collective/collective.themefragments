@@ -1,11 +1,11 @@
 Changelog
 =========
 
-0.9.1 (unreleased)
-------------------
+0.10.0 (unreleased)
+-------------------
 
-- Nothing changed yet.
-
+- Add restricted view methods (with fragments/templatename.methodname.py)
+  [datakurre]
 
 0.9.0 (2015-04-01)
 ------------------
