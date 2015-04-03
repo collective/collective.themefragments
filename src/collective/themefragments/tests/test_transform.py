@@ -39,6 +39,20 @@ class TestCase(unittest.TestCase):
 
         self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
 
+    def test_scripted_theme_fragment_traverser(self):
+        app = self.layer['app']
+        portal = self.layer['portal']
+        self.settings.enabled = True
+        self.settings.currentTheme = u'collective.themefragments.tests'
+        self.settings.rules = u'/++theme++collective.themefragments.tests/rules.xml'
+
+        transaction.commit()
+
+        browser = Browser(app)
+        browser.open(portal.absolute_url() + '/@@theme-fragment/scripted_customnav')  # noqa
+
+        self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
+
     def test_theme_fragment_traverser_invalid_url(self):
         app = self.layer['app']
         portal = self.layer['portal']
@@ -88,6 +102,26 @@ class TestCase(unittest.TestCase):
             # tries to use an underscore attribute, which isn't traversable
             # in restricted python
             browser.open(portal.absolute_url() + '/@@theme-fragment/invalid')
+        except HTTPError, e:
+            error = e
+
+        self.assertEqual(error.code, 500)
+
+    def test_scripted_theme_fragment_traverser_restricted_python(self):
+        app = self.layer['app']
+        portal = self.layer['portal']
+        self.settings.enabled = True
+        self.settings.currentTheme = u'collective.themefragments.tests'
+        self.settings.rules = u'/++theme++collective.themefragments.tests/rules.xml'  # noqa
+
+        transaction.commit()
+
+        browser = Browser(app)
+
+        try:
+            # tries to use an underscore attribute, which isn't traversable
+            # in restricted python
+            browser.open(portal.absolute_url() + '/@@theme-fragment/scripted_invalid')  # noqa
         except HTTPError, e:
             error = e
 
