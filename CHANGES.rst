@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.10.0 (unreleased)
+0.10.0 (2015-04-03)
 -------------------
 
 - Add restricted view methods (with fragments/templatename.methodname.py)
