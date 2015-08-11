@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<registry>
+  <!-- Legacy tile registration -->
+  <record name="plone.app.tiles">
+    <field type="plone.registry.field.List">
+      <title>Tiles</title>
+      <value_type type="plone.registry.field.TextLine" />
+    </field>
+    <value purge="false">
+      <element>collective.themefragment.fragment</element>
+    </value>
+  </record>
+
+  <!-- Mosaic tile registration -->
+  <records prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
+           interface="plone.app.mosaic.interfaces.ITile">
+    <value key="name">collective.themefragments.fragment</value>
+    <value key="label">Theme fragment</value>
+    <value key="category">advanced</value>
+    <value key="tile_type">app</value>
+    <value key="default_value"/>
+    <value key="read_only">false</value>
+    <value key="settings">true</value>
+    <value key="favorite">false</value>
+    <value key="rich_text">false</value>
+    <value key="weight">100</value>
+  </records>
+
+  <record name="plone.app.mosaic.app_tiles.collective.themefragments_fragment.available_actions">
+    <field type="plone.registry.field.List">
+      <title>Available actions for the theme fragment tile</title>
+      <value_type type="plone.registry.field.TextLine" />
+    </field>
+    <value>
+    </value>
+  </record>
+</registry>

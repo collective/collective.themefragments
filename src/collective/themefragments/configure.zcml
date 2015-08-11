@@ -1,6 +1,10 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.themefragments">
 
   <!-- Theme traverser -->
@@ -12,4 +16,27 @@
       permission="zope.Public"
       />
 
+  <!-- Tile -->
+  <plone:tile
+      name="collective.themefragments.fragment"
+      title="Theme fragment tile"
+      description="Displays selected fragment from the current theme"
+      for="*"
+      schema=".tiles.IFragmentTile"
+      class=".tiles.FragmentTile"
+      permission="zope2.View"
+      add_permission="cmf.ModifyPortalContent"
+      zcml:condition="installed plone.tiles"
+      />
+
+  <!-- Profile -->
+  <genericsetup:registerProfile
+      name="default"
+      title="Theme fragment tile"
+      description="Add theme fragment tile for Plone Mosaic"
+      directory="profiles/default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      i18n:attributes="title description"
+      zcml:condition="installed plone.app.mosaic"
+      />
 </configure>
