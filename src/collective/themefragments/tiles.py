@@ -165,7 +165,6 @@ class FragmentTileDataManager(TransientTileDataManager):
             fragment = data['fragment']
             for schema_ in getFragmentSchemata(fragment):
                 try:
-                    print self.tile.request.form
                     data.update(decode(self.tile.request.form,
                                        schema_, missing=True))
                 except (ValueError, UnicodeDecodeError,):
