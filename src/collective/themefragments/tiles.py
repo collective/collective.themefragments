@@ -6,9 +6,20 @@ from os.path import splitext
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
+from plone.app.tiles.browser.add import DefaultAddForm
+from plone.app.tiles.browser.add import DefaultAddView
+from plone.app.tiles.browser.edit import DefaultEditForm
+from plone.app.tiles.browser.edit import DefaultEditView
+from plone.memoize.view import memoize
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
+from plone.supermodel.parser import parse
 from plone.tiles import Tile
+from plone.tiles.absoluteurl import TransientTileAbsoluteURL
+from plone.tiles.data import encode
+from plone.tiles.data import decode
+from plone.tiles.data import TransientTileDataManager
+from plone.tiles.interfaces import ITileDataManager
 from zope import schema
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
@@ -60,6 +71,34 @@ def themeFragments(context):
     )
 
 
+def getFragmentSchemata(name):
+    request = getRequest()
+    filename = (u'{0:s}.xml'.format(name)).encode('utf-8', 'ignore')
+
+    if not isThemeEnabled(request):
+        return SimpleVocabulary([])
+
+    currentTheme = getCurrentTheme()
+    if currentTheme is None:
+        return SimpleVocabulary([])
+
+    themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)
+    if themeDirectory is None:
+        return SimpleVocabulary([])
+
+    if not themeDirectory.isDirectory(FRAGMENTS_DIRECTORY):
+        return SimpleVocabulary([])
+
+    if not themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename):
+        return ()
+
+    handle = themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename)
+    schemata = parse(handle).schemata.values()
+    for schema_ in schemata:
+        schema_.__name__ = schema_.__name__.encode('utf-8', 'ignore')
+    return schemata
+
+
 class IFragmentTile(model.Schema):
     fragment = schema.Choice(
         title=_(u'Theme fragment'),
@@ -83,3 +122,66 @@ class FragmentTile(Tile):
     def __call__(self):
         self.update()
         return u'<html><body>{0:s}</body></html>'.format(self.index())
+
+
+class FragmentTileAddForm(DefaultAddForm):
+    """Fragment tile add form"""
+
+    @property
+    @memoize
+    def additionalSchemata(self):
+        fragment = self.request.form.get('fragment')
+        if fragment:
+            return getFragmentSchemata(fragment)
+        else:
+            return ()
+
+
+class FragmentTileEditForm(DefaultEditForm):
+    """Fragment tile edit form"""
+
+    @property
+    @memoize
+    def additionalSchemata(self):
+        fragment = self.request.form.get('fragment')
+        if fragment:
+            return getFragmentSchemata(fragment)
+        else:
+            return ()
+
+
+class FragmentTileAddView(DefaultAddView):
+    form = FragmentTileAddForm
+
+
+class FragmentTileEditView(DefaultEditView):
+    form = FragmentTileEditForm
+
+
+class FragmentTileDataManager(TransientTileDataManager):
+    def get(self):
+        data = super(FragmentTileDataManager, self).get()
+        if data and self.key not in self.annotations and 'fragment' in data:
+            fragment = data['fragment']
+            for schema_ in getFragmentSchemata(fragment):
+                try:
+                    print self.tile.request.form
+                    data.update(decode(self.tile.request.form,
+                                       schema_, missing=True))
+                except (ValueError, UnicodeDecodeError,):
+                    pass
+        return data
+
+
+class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
+    def __str__(self):
+        url = super(FragmentTileAbsoluteURL, self).__str__()
+        data = ITileDataManager(self.context).get()
+        if data and 'fragment' in data:
+            fragment = data['fragment']
+            for schema_ in getFragmentSchemata(fragment):
+                if '?' in url:
+                    url += '&' + encode(data, schema_)
+                else:
+                    url += '?' + encode(data, schema_)
+        return url

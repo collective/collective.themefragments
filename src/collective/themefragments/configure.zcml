@@ -29,6 +29,42 @@
       zcml:condition="installed plone.tiles"
       />
 
+  <view
+      for=".tiles.FragmentTile"
+      factory=".tiles.FragmentTileAbsoluteURL"
+      type="zope.publisher.interfaces.http.IHTTPRequest"
+      permission="zope.Public"
+      provides="zope.traversing.browser.interfaces.IAbsoluteURL"
+      zcml:condition="installed plone.tiles"
+      />
+
+  <adapter
+      for=".tiles.FragmentTile"
+      provides="plone.tiles.interfaces.ITileDataManager"
+      factory=".tiles.FragmentTileDataManager"
+      zcml:condition="installed plone.tiles"
+      />
+
+  <adapter
+      for="zope.annotation.interfaces.IAnnotatable
+           zope.publisher.interfaces.browser.IDefaultBrowserLayer
+           plone.tiles.interfaces.ITileType"
+      provides="plone.app.tiles.interfaces.ITileAddView"
+      factory=".tiles.FragmentTileAddView"
+      name="collective.themefragments.fragment"
+      zcml:condition="installed plone.app.tiles"
+      />
+
+  <adapter
+      for="zope.annotation.interfaces.IAnnotatable
+           zope.publisher.interfaces.browser.IDefaultBrowserLayer
+           plone.tiles.interfaces.ITileType"
+      provides="plone.app.tiles.interfaces.ITileEditView"
+      factory=".tiles.FragmentTileEditView"
+      name="collective.themefragments.fragment"
+      zcml:condition="installed plone.app.tiles"
+      />
+
   <!-- Profile -->
   <genericsetup:registerProfile
       name="default"
@@ -39,4 +75,5 @@
       i18n:attributes="title description"
       zcml:condition="installed plone.app.mosaic"
       />
+
 </configure>
