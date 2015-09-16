@@ -1,8 +1,8 @@
 Changelog
 =========
 
-0.10.1 (unreleased)
--------------------
+1.0.0 (unreleased)
+------------------
 
 - Add supermodel xml based configuration support for theme fragment tiles
   [datakurre]
