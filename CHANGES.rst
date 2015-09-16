@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.0 (unreleased)
+1.0.0 (2015-09-16)
 ------------------
 
 - Add fragment tile for plone.app.mosaic
