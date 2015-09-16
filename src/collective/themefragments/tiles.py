@@ -38,6 +38,7 @@ logger = logging.getLogger('collective.themefragments')
 # basename = Display title
 #
 
+
 @provider(IContextSourceBinder)
 def themeFragments(context):
     request = getRequest()
