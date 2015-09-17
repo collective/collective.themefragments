@@ -32,6 +32,13 @@
         add_permission="cmf.ModifyPortalContent"
         />
 
+  <adapter
+      for=".tiles.FragmentTile"
+      provides="plone.tiles.interfaces.ITileDataManager"
+      factory=".tiles.fragmentTileDataManagerFactory"
+      zcml:condition="installed plone.tiles"
+      />
+
     <view
         for=".tiles.FragmentTile"
         factory=".tiles.FragmentTileAbsoluteURL"
