@@ -7,7 +7,7 @@ from urllib2 import HTTPError
 from zope.component import getUtility
 import Globals
 import transaction
-import unittest2 as unittest
+import unittest
 
 
 class TestCase(unittest.TestCase):
