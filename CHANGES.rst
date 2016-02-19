@@ -4,8 +4,8 @@ Changelog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix issue where plone:tile -directive was not properly included
+  [Asko Soukka]
 
 1.0.0 (2015-09-16)
 ------------------
