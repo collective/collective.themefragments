@@ -17,53 +17,56 @@
       />
 
   <!-- Tile -->
-  <plone:tile
-      name="collective.themefragments.fragment"
-      title="Theme fragment tile"
-      description="Displays selected fragment from the current theme"
-      for="*"
-      schema=".tiles.IFragmentTile"
-      class=".tiles.FragmentTile"
-      permission="zope2.View"
-      add_permission="cmf.ModifyPortalContent"
-      zcml:condition="installed plone.tiles"
-      />
+  <configure zcml:condition="installed plone.tiles">
 
-  <view
-      for=".tiles.FragmentTile"
-      factory=".tiles.FragmentTileAbsoluteURL"
-      type="zope.publisher.interfaces.http.IHTTPRequest"
-      permission="zope.Public"
-      provides="zope.traversing.browser.interfaces.IAbsoluteURL"
-      zcml:condition="installed plone.tiles"
-      />
+    <include package="plone.tiles" file="meta.zcml" />
 
-  <adapter
-      for=".tiles.FragmentTile"
-      provides="plone.tiles.interfaces.ITileDataManager"
-      factory=".tiles.FragmentTileDataManager"
-      zcml:condition="installed plone.tiles"
-      />
+    <plone:tile
+        name="collective.themefragments.fragment"
+        title="Theme fragment tile"
+        description="Displays selected fragment from the current theme"
+        for="*"
+        schema=".tiles.IFragmentTile"
+        class=".tiles.FragmentTile"
+        permission="zope2.View"
+        add_permission="cmf.ModifyPortalContent"
+        />
 
-  <adapter
-      for="zope.annotation.interfaces.IAnnotatable
-           zope.publisher.interfaces.browser.IDefaultBrowserLayer
-           plone.tiles.interfaces.ITileType"
-      provides="plone.app.tiles.interfaces.ITileAddView"
-      factory=".tiles.FragmentTileAddView"
-      name="collective.themefragments.fragment"
-      zcml:condition="installed plone.app.tiles"
-      />
+    <view
+        for=".tiles.FragmentTile"
+        factory=".tiles.FragmentTileAbsoluteURL"
+        type="zope.publisher.interfaces.http.IHTTPRequest"
+        permission="zope.Public"
+        provides="zope.traversing.browser.interfaces.IAbsoluteURL"
+        />
 
-  <adapter
-      for="zope.annotation.interfaces.IAnnotatable
-           zope.publisher.interfaces.browser.IDefaultBrowserLayer
-           plone.tiles.interfaces.ITileType"
-      provides="plone.app.tiles.interfaces.ITileEditView"
-      factory=".tiles.FragmentTileEditView"
-      name="collective.themefragments.fragment"
-      zcml:condition="installed plone.app.tiles"
-      />
+    <adapter
+        for=".tiles.FragmentTile"
+        provides="plone.tiles.interfaces.ITileDataManager"
+        factory=".tiles.FragmentTileDataManager"
+        />
+
+    <adapter
+        for="zope.annotation.interfaces.IAnnotatable
+             zope.publisher.interfaces.browser.IDefaultBrowserLayer
+             plone.tiles.interfaces.ITileType"
+        provides="plone.app.tiles.interfaces.ITileAddView"
+        factory=".tiles.FragmentTileAddView"
+        name="collective.themefragments.fragment"
+        zcml:condition="installed plone.app.tiles"
+        />
+
+    <adapter
+        for="zope.annotation.interfaces.IAnnotatable
+             zope.publisher.interfaces.browser.IDefaultBrowserLayer
+             plone.tiles.interfaces.ITileType"
+        provides="plone.app.tiles.interfaces.ITileEditView"
+        factory=".tiles.FragmentTileEditView"
+        name="collective.themefragments.fragment"
+        zcml:condition="installed plone.app.tiles"
+        />
+
+  </configure>
 
   <!-- Profile -->
   <genericsetup:registerProfile
