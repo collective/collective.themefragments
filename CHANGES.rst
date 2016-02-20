@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.1 (unreleased)
+1.0.1 (2016-02-21)
 ------------------
 
 - Fix issue where plone:tile -directive was not properly included
