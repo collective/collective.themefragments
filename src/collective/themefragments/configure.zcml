@@ -22,7 +22,7 @@
     <include package="plone.tiles" file="meta.zcml" />
 
     <plone:tile
-        name="collective.themefragments.fragment"
+        name="themefragment"
         title="Theme fragment tile"
         description="Displays selected fragment from the current theme"
         for="*"

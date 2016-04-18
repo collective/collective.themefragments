@@ -7,14 +7,14 @@
       <value_type type="plone.registry.field.TextLine" />
     </field>
     <value purge="false">
-      <element>collective.themefragment.fragment</element>
+      <element>themefragment</element>
     </value>
   </record>
 
   <!-- Mosaic tile registration -->
   <records prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
            interface="plone.app.mosaic.interfaces.ITile">
-    <value key="name">collective.themefragments.fragment</value>
+    <value key="name">themefragment</value>
     <value key="label">Theme fragment</value>
     <value key="category">advanced</value>
     <value key="tile_type">app</value>
