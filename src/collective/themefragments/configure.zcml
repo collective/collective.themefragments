@@ -66,6 +66,11 @@
         zcml:condition="installed plone.app.tiles"
         />
 
+    <utility
+        factory=".tiles.ThemeFragmentsTilesVocabularyFactory"
+        name="collective.themefragments.tiles"
+        />
+
   </configure>
 
   <!-- Profile -->

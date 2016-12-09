@@ -23,8 +23,8 @@ from plone.tiles.interfaces import ITileDataManager
 from zope import schema
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
-from zope.interface import provider
-from zope.schema.interfaces import IContextSourceBinder
+from zope.interface import implementer
+from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 import logging
@@ -39,37 +39,38 @@ logger = logging.getLogger('collective.themefragments')
 #
 
 
-@provider(IContextSourceBinder)
-def themeFragments(context):
-    request = getRequest()
+@implementer(IVocabularyFactory)
+class ThemeFragmentsTilesVocabularyFactory(object):
+    def __call__(self, context=None):
+        request = getRequest()
 
-    if not isThemeEnabled(request):
-        return SimpleVocabulary([])
+        if not isThemeEnabled(request):
+            return SimpleVocabulary([])
 
-    currentTheme = getCurrentTheme()
-    if currentTheme is None:
-        return SimpleVocabulary([])
+        currentTheme = getCurrentTheme()
+        if currentTheme is None:
+            return SimpleVocabulary([])
 
-    themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)
-    if themeDirectory is None:
-        return SimpleVocabulary([])
+        themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)  # noqa
+        if themeDirectory is None:
+            return SimpleVocabulary([])
 
-    if not themeDirectory.isDirectory(FRAGMENTS_DIRECTORY):
-        return SimpleVocabulary([])
+        if not themeDirectory.isDirectory(FRAGMENTS_DIRECTORY):
+            return SimpleVocabulary([])
 
-    settings = getPluginSettings(
-        themeDirectory, plugins=[('themefragments:tiles', None)]
-    ).get('themefragments:tiles', {})
+        settings = getPluginSettings(
+            themeDirectory, plugins=[('themefragments:tiles', None)]
+        ).get('themefragments:tiles', {})
 
-    tiles = [splitext(filename)[0] for filename
-             in themeDirectory[FRAGMENTS_DIRECTORY].listDirectory()
-             if splitext(filename)[-1] == '.pt'
-             and themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)]
+        tiles = [splitext(filename)[0] for filename
+                 in themeDirectory[FRAGMENTS_DIRECTORY].listDirectory()
+                 if splitext(filename)[-1] == '.pt' and
+                 themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)]
 
-    return SimpleVocabulary(
-        [SimpleTerm(None, '', _(u'-- select fragment --'))] +
-        [SimpleTerm(tile, tile, settings.get(tile, tile)) for tile in tiles]
-    )
+        return SimpleVocabulary(
+            [SimpleTerm(None, '', _(u'-- select fragment --'))] +
+            [SimpleTerm(tile, tile, settings.get(tile, tile)) for tile in tiles]  # noqa
+        )
 
 
 def getFragmentSchemata(name):
@@ -103,7 +104,7 @@ def getFragmentSchemata(name):
 class IFragmentTile(model.Schema):
     fragment = schema.Choice(
         title=_(u'Theme fragment'),
-        source=themeFragments,
+        vocabulary='collective.themefragments.tiles',
     )
 
 
