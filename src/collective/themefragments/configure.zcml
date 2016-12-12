@@ -66,6 +66,11 @@
         zcml:condition="installed plone.app.tiles"
         />
 
+    <utility factory=".tiles.FragmentSchemaPolicy"
+             name="collective.themefragments" />
+
+    <adapter factory=".tiles.layoutAwareFragmentTileDataStorage" />
+
     <utility
         factory=".tiles.ThemeFragmentsTilesVocabularyFactory"
         name="collective.themefragments.tiles"
