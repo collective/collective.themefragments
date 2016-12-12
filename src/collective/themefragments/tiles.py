@@ -169,7 +169,11 @@ class FragmentTileAddForm(DefaultAddForm):
     @property
     @memoize
     def schema(self):
-        fragment = self.request.form.get('fragment')
+        fragment = self.request.form.get(
+            'fragment', self.request.form.get(
+                'collective.themefragments.fragment.fragment'))
+        if fragment and isinstance(fragment, list):
+            fragment = fragment[0]
         return fragment and getFragmentSchema(fragment) or IFragmentTile
 
 
@@ -179,7 +183,11 @@ class FragmentTileEditForm(DefaultEditForm):
     @property
     @memoize
     def schema(self):
-        fragment = self.request.form.get('fragment')
+        fragment = self.request.form.get(
+            'fragment', self.request.form.get(
+                'collective.themefragments.fragment.fragment'))
+        if fragment and isinstance(fragment, list):
+            fragment = fragment[0]
         return fragment and getFragmentSchema(fragment) or IFragmentTile
 
 
@@ -215,7 +223,11 @@ class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
     def resolve(self, key):
         name, schema_ = super(
             LayoutAwareFragmentTileDataStorage, self).resolve(key)
-        fragment = self.request.form.get('fragment')
+        fragment = self.request.form.get(
+            'fragment', self.request.form.get(
+                'collective.themefragments.fragment.fragment'))
+        if fragment and isinstance(fragment, list):
+            fragment = fragment[0]
         return '@@{0:s}/{1:s}'.format(name, key), \
             fragment and getFragmentSchema(fragment) or schema_
 
