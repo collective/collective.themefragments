@@ -171,3 +171,30 @@ user (or *Anonymous*, if the current user is not logged in). Information (such
 as content items or their attributes) not accessible to the current user cannot
 be rendered, and may result in a ``403 Forbidden`` error when rendering the
 fragment.
+
+Fragment tiles
+++++++++++++++
+
+With `plone.tiles`_, `plone.app.tiles`_ and `plone.app.blocks`_ installed this
+package provides an additional installation profile for *Theme fragment tile*,
+which can be used to place theme fragments as tiles.
+
+More readable titles for theme fragments can be defined in theme manifest.cfg
+with:
+
+.. code:: ini
+
+   [theme:themefragments:tiles]
+   basename = Display title
+
+Where *basename* is the basename of fragment filename (the part before
+``.pt``).
+
+Tiles can define their configuration schema using `plone.supermodel`_ XML in a
+fragment specific file having its matching filename ending with ``.xml``
+instaead of ``.pt``.
+
+.. _plone.tiles: https://pypi.python.org/pypi/plone.tiles
+.. _plone.supermodel: https://pypi.python.org/pypi/plone.supermodel
+.. _plone.app.tiles: https://pypi.python.org/pypi/plone.app.tiles
+.. _plone.app.blocks: https://pypi.python.org/pypi/plone.app.blocks

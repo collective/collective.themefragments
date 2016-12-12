@@ -1,10 +1,12 @@
 Changelog
 =========
 
-1.1.1 (unreleased)
+2.0.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Upgrade Theme fragment tiles with custom scheme to support layout aware
+  tile data storage introduced in plone.app.blocks 4.0
+  [datakurre]
 
 
 1.1.0 (2016-12-12)
