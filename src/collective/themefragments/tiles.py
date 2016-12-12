@@ -3,6 +3,8 @@ from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.traversal import ThemeFragment
 from collective.themefragments.utils import getPluginSettings
 from os.path import splitext
+from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
+from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -13,26 +15,30 @@ from plone.app.tiles.browser.edit import DefaultEditView
 from plone.memoize.view import memoize
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
+from plone.supermodel.interfaces import ISchemaPolicy
+from plone.supermodel.parser import DefaultSchemaPolicy
 from plone.supermodel.parser import parse
-from plone.tiles import Tile
 from plone.tiles.absoluteurl import TransientTileAbsoluteURL
+from plone.tiles.data import decode
+from plone.tiles.data import defaultTileDataStorage
+from plone.tiles.data import encode
 from plone.tiles.data import PersistentTileDataManager
 from plone.tiles.data import TransientTileDataManager
-from plone.tiles.data import decode
-from plone.tiles.data import encode
+from plone.tiles import Tile
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
-from zope import schema
+from plone.tiles.interfaces import ITileDataStorage
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
+from zope import schema
 from zope.interface import implementer
-from zope.schema.interfaces import IVocabularyFactory
-from zope.interface import provider
+from zope.interface import Interface
 from zope.schema import getFields
-from zope.schema.interfaces import IContextSourceBinder
+from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+
 import logging
 
 _ = MessageFactory('collective.themefragments')
@@ -47,6 +53,7 @@ logger = logging.getLogger('collective.themefragments')
 
 @implementer(IVocabularyFactory)
 class ThemeFragmentsTilesVocabularyFactory(object):
+    """Return vocabulary of available theme fragments to be used as tiles"""
     def __call__(self, context=None):
         request = getRequest()
 
@@ -64,6 +71,7 @@ class ThemeFragmentsTilesVocabularyFactory(object):
         if not themeDirectory.isDirectory(FRAGMENTS_DIRECTORY):
             return SimpleVocabulary([])
 
+        # Get settings to map titles
         settings = getPluginSettings(
             themeDirectory, plugins=[('themefragments:tiles', None)]
         ).get('themefragments:tiles', {})
@@ -79,7 +87,15 @@ class ThemeFragmentsTilesVocabularyFactory(object):
         )
 
 
+# Helper adapters
+@implementer(ISchemaPolicy)
+class FragmentSchemaPolicy(DefaultSchemaPolicy):
+    def bases(self, schemaName, tree):
+        return IFragmentTile,
+
+
 def getFragmentSchemata(name):
+    """Get matching XML schema for theme fragment"""
     request = getRequest()
     filename = (u'{0:s}.xml'.format(name)).encode('utf-8', 'ignore')
 
@@ -101,13 +117,22 @@ def getFragmentSchemata(name):
         return ()
 
     handle = themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename)
-    schemata = parse(handle).schemata.values()
+    schemata = parse(handle, 'collective.themefragments').schemata.values()
     for schema_ in schemata:
         schema_.__name__ = schema_.__name__.encode('utf-8', 'ignore')
     return schemata
 
 
+def getFragmentSchema(name):
+    """Only ever return the first schema of the parsed schemata or None"""
+    for schema_ in getFragmentSchemata(name):
+        return schema_
+    return None
+
+
 class IFragmentTile(model.Schema):
+    """Generic theme fragment tile"""
+
     fragment = schema.Choice(
         title=_(u'Theme fragment'),
         vocabulary='collective.themefragments.tiles',
@@ -117,19 +142,25 @@ class IFragmentTile(model.Schema):
 class FragmentTile(Tile):
     """A tile that displays a theme fragment"""
 
+    def __init__(self, context, request):
+        super(FragmentTile, self).__init__(context, request)
+        self.index = None
+
     def update(self):
         try:
             self.index = ThemeFragment(self.context, self.request)[
                 self.data['fragment'].encode('utf-8')]
+            self.index.data = self.data
         except KeyError:
             logger.error(u"Theme fragment '{0:s}' was not found.".format(
-                self.data['fragment']
-            ))
-            self.index = lambda: u''
+                self.data['fragment']))
 
     def __call__(self):
         self.update()
-        return u'<html><body>{0:s}</body></html>'.format(self.index())
+        if self.index is not None:
+            return u'<html><body>{0:s}</body></html>'.format(self.index())
+        else:
+            return u'<html></html>'
 
 
 class FragmentTileAddForm(DefaultAddForm):
@@ -137,12 +168,9 @@ class FragmentTileAddForm(DefaultAddForm):
 
     @property
     @memoize
-    def additionalSchemata(self):
+    def schema(self):
         fragment = self.request.form.get('fragment')
-        if fragment:
-            return getFragmentSchemata(fragment)
-        else:
-            return ()
+        return fragment and getFragmentSchema(fragment) or IFragmentTile
 
 
 class FragmentTileEditForm(DefaultEditForm):
@@ -150,12 +178,9 @@ class FragmentTileEditForm(DefaultEditForm):
 
     @property
     @memoize
-    def additionalSchemata(self):
+    def schema(self):
         fragment = self.request.form.get('fragment')
-        if fragment:
-            return getFragmentSchemata(fragment)
-        else:
-            return ()
+        return fragment and getFragmentSchema(fragment) or IFragmentTile
 
 
 class FragmentTileAddView(DefaultAddView):
@@ -175,6 +200,26 @@ def fragmentTileDataManagerFactory(tile):
         return FragmentTileDataManager(tile)
 
 
+@implementer(ITileDataStorage)
+@adapter(ILayoutBehaviorAdaptable, Interface, FragmentTile)
+def layoutAwareFragmentTileDataStorage(context, request, tile):
+    if tile.id is not None:
+        return LayoutAwareFragmentTileDataStorage(context, request, tile)
+    else:
+        return defaultTileDataStorage(context, request, tile)
+
+
+@implementer(ITileDataStorage)
+@adapter(ILayoutBehaviorAdaptable, Interface, FragmentTile)
+class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
+    def resolve(self, key):
+        name, schema_ = super(
+            LayoutAwareFragmentTileDataStorage, self).resolve(key)
+        fragment = self.request.form.get('fragment')
+        return '@@{0:s}/{1:s}'.format(name, key), \
+            fragment and getFragmentSchema(fragment) or schema_
+
+
 class FragmentTileDataManager(TransientTileDataManager):
     def get(self):
         data = super(FragmentTileDataManager, self).get()
@@ -191,7 +236,7 @@ class FragmentTileDataManager(TransientTileDataManager):
 
 class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
     def __str__(self):
-        url = super(FragmentTileAbsoluteURL, self).__str__()
+        url = super(FragmentTileAbsoluteURL, self).__str__().split('?')[0]
         data = ITileDataManager(self.context).get()
         if data and 'fragment' in data:
             fragment = data['fragment']
@@ -204,16 +249,15 @@ class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
 
 
 class PersistentFragmentTileDataManager(PersistentTileDataManager):
-    def _get_default_request_data(self):
-        data = super(PersistentFragmentTileDataManager, self)\
-            ._get_default_request_data()
+    def get_default_request_data(self):
+        data = super(PersistentFragmentTileDataManager, self).get_default_request_data()  # noqa
         if data and self.key not in self.annotations and 'fragment' in data:
             fragment = data['fragment']
             for schema_ in getFragmentSchemata(fragment):
                 try:
                     data.update(decode(self.tile.request.form,
                                        schema_, missing=True))
-                except (ValueError, UnicodeDecodeError,):
+                except (ValueError, UnicodeDecodeError):
                     pass
         return data
 
