@@ -32,13 +32,6 @@
         add_permission="cmf.ModifyPortalContent"
         />
 
-  <adapter
-      for=".tiles.FragmentTile"
-      provides="plone.tiles.interfaces.ITileDataManager"
-      factory=".tiles.fragmentTileDataManagerFactory"
-      zcml:condition="installed plone.tiles"
-      />
-
     <view
         for=".tiles.FragmentTile"
         factory=".tiles.FragmentTileAbsoluteURL"
@@ -72,6 +65,11 @@
         name="collective.themefragments.fragment"
         zcml:condition="installed plone.app.tiles"
         />
+
+    <utility factory=".tiles.FragmentSchemaPolicy"
+             name="collective.themefragments" />
+
+    <adapter factory=".tiles.layoutAwareFragmentTileDataStorage" />
 
     <utility
         factory=".tiles.ThemeFragmentsTilesVocabularyFactory"
