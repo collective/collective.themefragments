@@ -183,7 +183,7 @@ class ThemeFragment(BrowserPage):
         if not themeDirectory.isFile(templatePath):
             raise KeyError(name)
 
-        template = themeDirectory.readFile(templatePath)
+        template = themeDirectory.readFile(templatePath).decode('utf-8', 'replace')  # noqa
 
         # Now disable the theme so we don't double-transform
         self.request.response.setHeader('X-Theme-Disabled', '1')
