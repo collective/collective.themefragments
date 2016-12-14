@@ -4,8 +4,8 @@ Changelog
 2.0.0rc2 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- Fix issue where fragment was not properly decoded
+  [datakurre]
 
 2.0.0rc1 (2016-12-12)
 ---------------------
