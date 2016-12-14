@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.0rc2 (unreleased)
+2.0.0rc2 (2016-12-14)
 ---------------------
 
 - Fix issue where fragment was not properly decoded
