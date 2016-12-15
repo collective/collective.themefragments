@@ -71,6 +71,18 @@
 
     <adapter factory=".tiles.layoutAwareFragmentTileDataStorage" />
 
+    <adapter
+        provides="plone.app.widgets.interfaces.IFieldPermissionChecker"
+        for=".tiles.FragmentTileAddView"
+        factory=".tiles.FragmentTilePermissionChecker"
+        zcml:condition="installed plone.app.widgets"/>
+
+    <adapter
+        provides="plone.app.widgets.interfaces.IFieldPermissionChecker"
+        for=".tiles.FragmentTileEditView"
+        factory=".tiles.FragmentTilePermissionChecker"
+        zcml:condition="installed plone.app.widgets"/>
+
     <utility
         factory=".tiles.ThemeFragmentsTilesVocabularyFactory"
         name="collective.themefragments.tiles"

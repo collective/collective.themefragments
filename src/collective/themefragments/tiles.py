@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from AccessControl import getSecurityManager
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.traversal import ThemeFragment
 from collective.themefragments.utils import getPluginSettings
 from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
+from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -198,6 +200,14 @@ class FragmentTileAddView(DefaultAddView):
 
 class FragmentTileEditView(DefaultEditView):
     form = FragmentTileEditForm
+
+
+class FragmentTilePermissionChecker(GenericFormFieldPermissionChecker):
+    def validate(self, field_name, vocabulary_name=None):
+        # We may not have fragment name and therefore cannot resolve
+        # the real schema. The best we can is check for the default permission.
+        checker = getSecurityManager().checkPermission
+        return checker(self.DEFAULT_PERMISSION, self.context)
 
 
 @adapter(ITile)
