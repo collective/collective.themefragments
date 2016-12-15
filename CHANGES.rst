@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.0rc3 (unreleased)
+2.0.0rc3 (2016-12-15)
 ---------------------
 
 - Fix issue where fragments didn't render when traversed from a view context
