@@ -4,14 +4,14 @@ Changelog
 2.0.0rc4 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- Fix to hide fragments with empty title from tile menu
+  [datakurre]
 
 2.0.0rc3 (2016-12-15)
 ---------------------
 
 - Fix issue where fragments didn't render when traversed from a view context
-  [Asko Soukka]
+  [datakurre]
 
 2.0.0rc2 (2016-12-14)
 ---------------------
