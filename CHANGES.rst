@@ -4,8 +4,8 @@ Changelog
 2.0.0rc3 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- Fix issue where fragments didn't render when traversed from a view context
+  [Asko Soukka]
 
 2.0.0rc2 (2016-12-14)
 ---------------------
