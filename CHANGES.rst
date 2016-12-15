@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.0rc4 (unreleased)
+2.0.0rc4 (2016-12-15)
 ---------------------
 
 - Fix to hide fragments with empty title from tile menu
