@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from AccessControl.ZopeGuards import get_safe_globals
 from AccessControl.ZopeGuards import guarded_getattr
-from Products.CMFCore.utils import getToolByName
-from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
-from RestrictedPython import compile_restricted_function
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import isThemeEnabled, getCurrentTheme
 from plone.memoize import forever
 from plone.resource.utils import queryResourceDirectory
+from Products.CMFCore.utils import getToolByName
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from RestrictedPython import compile_restricted_function
 from zExceptions import NotFound
 from zExceptions import Unauthorized
+from zope.browser.interfaces import IBrowserView
 from zope.interface import implements
 from zope.publisher.browser import BrowserPage
 from zope.publisher.interfaces import IPublishTraverse
@@ -60,6 +61,10 @@ class FragmentView(BrowserPage):
     __allow_access_to_unprotected_subobjects__ = 1
 
     def __init__(self, context, request, name, permission, template):
+        # Fix issue where context is a template based view class
+        while IBrowserView.providedBy(context):
+            context = Acquisition.aq_parent(Acquisition.aq_inner(context))
+
         super(FragmentView, self).__init__(context, request)
         self.__name__ = name
         self._permission = permission
