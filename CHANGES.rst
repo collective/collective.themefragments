@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.0rc5 (unreleased)
+2.0.0rc5 (2016-12-16)
 ---------------------
 
 - Add minimal permission field checker for fragment tile schemas
