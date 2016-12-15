@@ -4,8 +4,8 @@ Changelog
 2.0.0rc5 (unreleased)
 ---------------------
 
-- Nothing changed yet.
-
+- Add minimal permission field checker for fragment tile schemas
+  [datakurre]
 
 2.0.0rc4 (2016-12-15)
 ---------------------
