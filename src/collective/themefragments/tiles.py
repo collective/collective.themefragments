@@ -83,7 +83,8 @@ class ThemeFragmentsTilesVocabularyFactory(object):
 
         return SimpleVocabulary(
             [SimpleTerm(None, '', _(u'-- select fragment --'))] +
-            [SimpleTerm(tile, tile, settings.get(tile, tile)) for tile in tiles]  # noqa
+            [SimpleTerm(tile, tile, settings.get(tile, tile))
+             for tile in tiles if settings.get(tile, None) is not '']
         )
 
 
