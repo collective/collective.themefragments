@@ -30,7 +30,10 @@ from plone.tiles import Tile
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
+from z3c.form.form import Form
+from z3c.form.interfaces import IWidgets
 from zope.component import adapter
+from zope.component import getMultiAdapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
 from zope import schema
@@ -166,18 +169,45 @@ class FragmentTile(Tile):
             return u'<html></html>'
 
 
+def getFragmentName(request):
+    # 1) fragment name is serialized as 'fragment' by default, but
+    #    until plone.app.tiles' forms prefix it with tiletype
+    fragment = request.form.get(
+        'fragment', request.form.get(
+            'collective.themefragments.fragment.fragment'))
+    # 2) because fragment is Choice, it may be a list
+    if fragment and isinstance(fragment, list):
+        fragment = fragment[0]
+    # 3) during widget traversal, there's no querystring with fragment
+    #    and a convention of prefixing fields with fragment is used
+    if not fragment:
+        prefix = '++widget++collective.themefragments.'
+        last = request.getURL().split('/')[-1]
+        if last.startswith(prefix):
+            fragment = last[len(prefix):].split('.')[0]
+    if isinstance(fragment, unicode):
+        return fragment.encode('utf-8', 'replace')
+    else:
+        return fragment
+
+
 class FragmentTileAddForm(DefaultAddForm):
     """Fragment tile add form"""
 
     @property
     @memoize
     def schema(self):
-        fragment = self.request.form.get(
-            'fragment', self.request.form.get(
-                'collective.themefragments.fragment.fragment'))
-        if fragment and isinstance(fragment, list):
-            fragment = fragment[0]
+        fragment = getFragmentName(self.request)
         return fragment and getFragmentSchema(fragment) or IFragmentTile
+
+    def updateWidgets(self, prefix=None):
+        prefix = self.tileType.__name__
+        fragment = getFragmentName(self.request)
+        if fragment:
+            prefix = 'collective.themefragments.' + fragment
+        Form.updateWidgets(self, prefix=prefix)
+        self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
+        self.widgets['fragment'].update()
 
 
 class FragmentTileEditForm(DefaultEditForm):
@@ -186,12 +216,17 @@ class FragmentTileEditForm(DefaultEditForm):
     @property
     @memoize
     def schema(self):
-        fragment = self.request.form.get(
-            'fragment', self.request.form.get(
-                'collective.themefragments.fragment.fragment'))
-        if fragment and isinstance(fragment, list):
-            fragment = fragment[0]
+        fragment = getFragmentName(self.request)
         return fragment and getFragmentSchema(fragment) or IFragmentTile
+
+    def updateWidgets(self, prefix=None):
+        prefix = self.tileType.__name__
+        fragment = getFragmentName(self.request)
+        if fragment:
+            prefix = 'collective.themefragments.' + fragment
+        Form.updateWidgets(self, prefix=prefix)
+        self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
+        self.widgets['fragment'].update()
 
 
 class FragmentTileAddView(DefaultAddView):
@@ -234,11 +269,7 @@ class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
     def resolve(self, key):
         name, schema_ = super(
             LayoutAwareFragmentTileDataStorage, self).resolve(key)
-        fragment = self.request.form.get(
-            'fragment', self.request.form.get(
-                'collective.themefragments.fragment.fragment'))
-        if fragment and isinstance(fragment, list):
-            fragment = fragment[0]
+        fragment = getFragmentName(self.request)
         return '@@{0:s}/{1:s}'.format(name, key), \
             fragment and getFragmentSchema(fragment) or schema_
 
