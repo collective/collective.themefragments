@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.0.0rc6 (unreleased)
----------------------
+2.0.0 (2017-01-17)
+------------------
 
 - Add support for fragment specific widget traversal on fragment tile forms
   [Asko Soukka]
