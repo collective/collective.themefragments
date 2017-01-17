@@ -31,9 +31,7 @@ from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from z3c.form.form import Form
-from z3c.form.interfaces import IWidgets
 from zope.component import adapter
-from zope.component import getMultiAdapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
 from zope import schema
