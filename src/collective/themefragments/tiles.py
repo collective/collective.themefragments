@@ -14,6 +14,7 @@ from plone.app.tiles.browser.add import DefaultAddForm
 from plone.app.tiles.browser.add import DefaultAddView
 from plone.app.tiles.browser.edit import DefaultEditForm
 from plone.app.tiles.browser.edit import DefaultEditView
+from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
 from plone.memoize.view import memoize
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
@@ -52,6 +53,18 @@ logger = logging.getLogger('collective.themefragments')
 # [theme:themefragments:tiles]
 # basename = Display title
 #
+
+
+class TileCatalogSource(CatalogSourceBase):
+    """Catalog source, which falsely claims to include everything, because
+    otherwise tile data with broken references cannot be deserialized
+    (because broken reference would not be found from catalog source).
+    """
+    def __contains__(self, value):
+        return True  # Always contains to allow lazy handling of removed objs
+
+
+CatalogSource = TileCatalogSource()
 
 
 @implementer(IVocabularyFactory)
