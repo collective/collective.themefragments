@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1.0 (unreleased)
+2.0.1 (2017-01-18)
 ------------------
 
 - Add generic catalog source instance to be usable with TTW XML-schema tiles
