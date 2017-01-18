@@ -1,17 +1,17 @@
 Changelog
 =========
 
-2.0.1 (unreleased)
+2.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add generic catalog source instance to be usable with TTW XML-schema tiles
+  [datakurre]
 
 2.0.0 (2017-01-17)
 ------------------
 
 - Add support for fragment specific widget traversal on fragment tile forms
-  [Asko Soukka]
+  [datakurre]
 
 2.0.0rc5 (2016-12-16)
 ---------------------
