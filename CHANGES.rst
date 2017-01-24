@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.1.0 (unreleased)
+2.1.0 (2017-01-24)
 ------------------
 
 - Add support for fieldsest in TTW XML schemas with
