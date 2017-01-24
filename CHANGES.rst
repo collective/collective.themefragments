@@ -1,10 +1,12 @@
 Changelog
 =========
 
-2.0.2 (unreleased)
+2.1.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for fieldsest in TTW XML schemas with
+  plone.app.tiles >= 3.1.0
+  [datakurre]
 
 
 2.0.1 (2017-01-18)

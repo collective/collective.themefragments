@@ -31,6 +31,7 @@ from plone.tiles import Tile
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
+from plone.z3cform.fieldsets.group import Group
 from z3c.form.form import Form
 from zope.component import adapter
 from zope.globalrequest import getRequest
@@ -202,8 +203,18 @@ def getFragmentName(request):
         return fragment
 
 
+class PrefixedGroup(Group):
+    prefix = ''
+
+    def updateWidgets(self, prefix=None):
+        prefix = prefix or self.parentForm.widgetPrefix
+        super(Group, self).updateWidgets(prefix=prefix)
+
+
 class FragmentTileAddForm(DefaultAddForm):
     """Fragment tile add form"""
+
+    group_class = PrefixedGroup
 
     @property
     @memoize
@@ -211,12 +222,17 @@ class FragmentTileAddForm(DefaultAddForm):
         fragment = getFragmentName(self.request)
         return fragment and getFragmentSchema(fragment) or IFragmentTile
 
-    def updateWidgets(self, prefix=None):
+    @property
+    @memoize
+    def widgetPrefix(self):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
             prefix = 'collective.themefragments.' + fragment
-        Form.updateWidgets(self, prefix=prefix)
+        return prefix
+
+    def updateWidgets(self, prefix=None):
+        Form.updateWidgets(self, prefix=self.widgetPrefix)
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
 
@@ -224,18 +240,25 @@ class FragmentTileAddForm(DefaultAddForm):
 class FragmentTileEditForm(DefaultEditForm):
     """Fragment tile edit form"""
 
+    group_class = PrefixedGroup
+
     @property
     @memoize
     def schema(self):
         fragment = getFragmentName(self.request)
         return fragment and getFragmentSchema(fragment) or IFragmentTile
 
-    def updateWidgets(self, prefix=None):
+    @property
+    @memoize
+    def widgetPrefix(self):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
             prefix = 'collective.themefragments.' + fragment
-        Form.updateWidgets(self, prefix=prefix)
+        return prefix
+
+    def updateWidgets(self, prefix=None):
+        Form.updateWidgets(self, prefix=self.widgetPrefix)
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
 
