@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.0 (unreleased)
+2.2.0 (2017-01-25)
 ------------------
 
 - Add caching of parsed TTW tile schemas with theme policy cache
