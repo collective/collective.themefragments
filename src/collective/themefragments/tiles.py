@@ -7,6 +7,7 @@ from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
 from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
+from plone.app.theming.interfaces import IThemingPolicy
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -44,6 +45,7 @@ from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
+import Globals
 import logging
 
 _ = MessageFactory('collective.themefragments')
@@ -68,9 +70,37 @@ class TileCatalogSource(CatalogSourceBase):
 CatalogSource = TileCatalogSource()
 
 
+def cache(key):
+    def wrapper(func):
+        def cached(*args, **kwargs):
+            if Globals.DevelopmentMode:
+                return func(*args, **kwargs)
+
+            request = getRequest()
+            policy = IThemingPolicy(request)
+            cache_ = policy.getCache()
+            if not hasattr(cache_, 'collective.themefragments'):
+                setattr(cache_, 'collective.themefragments', {})
+            cache_ = getattr(cache_, 'collective.themefragments')
+
+            if callable(key):
+                key_ = key(*args)
+            else:
+                key_ = key
+
+            if key_ not in cache_:
+                cache_[key_] = func(*args, **kwargs)
+            return cache_[key_]
+
+        return cached
+    return wrapper
+
+
 @implementer(IVocabularyFactory)
 class ThemeFragmentsTilesVocabularyFactory(object):
     """Return vocabulary of available theme fragments to be used as tiles"""
+
+    @cache('vocabulary')
     def __call__(self, context=None):
         request = getRequest()
 
@@ -112,6 +142,7 @@ class FragmentSchemaPolicy(DefaultSchemaPolicy):
         return IFragmentTile,
 
 
+@cache(lambda *args: args[0])
 def getFragmentSchemata(name):
     """Get matching XML schema for theme fragment"""
     request = getRequest()
