@@ -208,7 +208,7 @@ class PrefixedGroup(Group):
 
     def updateWidgets(self, prefix=None):
         prefix = prefix or self.parentForm.widgetPrefix
-        super(Group, self).updateWidgets(prefix=prefix)
+        super(PrefixedGroup, self).updateWidgets(prefix=prefix)
 
 
 class FragmentTileAddForm(DefaultAddForm):
