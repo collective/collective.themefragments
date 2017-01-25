@@ -1,10 +1,11 @@
 Changelog
 =========
 
-2.1.1 (unreleased)
+2.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add caching of parsed TTW tile schemas with theme policy cache
+  [datakurre]
 
 
 2.1.0 (2017-01-24)
