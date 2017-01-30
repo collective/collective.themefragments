@@ -1,10 +1,14 @@
 Changelog
 =========
 
-2.2.1 (unreleased)
+2.3.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add theme fragment tile to use ESI rendering when ESI rendering
+  is enabled in plone.app.blocks; When ESI rendering is enabled, all
+  theme fragment tiles will be ESI rendred (it may become configurable
+  in the future)
+  [datakurre]
 
 
 2.2.0 (2017-01-25)
