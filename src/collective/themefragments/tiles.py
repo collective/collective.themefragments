@@ -29,6 +29,9 @@ from plone.tiles.data import encode
 from plone.tiles.data import PersistentTileDataManager
 from plone.tiles.data import TransientTileDataManager
 from plone.tiles import Tile
+from plone.tiles.esi import ESI_TEMPLATE
+from plone.tiles.interfaces import ESI_HEADER
+from plone.tiles.interfaces import IESIRendered
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
@@ -188,6 +191,7 @@ class IFragmentTile(model.Schema):
     )
 
 
+@implementer(IESIRendered)
 class FragmentTile(Tile):
     """A tile that displays a theme fragment"""
 
@@ -205,7 +209,21 @@ class FragmentTile(Tile):
                 self.data['fragment']))
 
     def __call__(self):
+        if self.request.getHeader(ESI_HEADER, 'false').lower() == 'true':
+            return ESI_TEMPLATE.format(
+                url=self.request.getURL(),
+                queryString=self.request.get('QUERY_STRING', ''),
+                esiMode='esi-body'
+            )
+
         self.update()
+
+        if self.id is not None:
+            self.request.response.setHeader(
+                'X-Tile-Url',
+                self.url[len(self.context.absolute_url()) + 1:]
+            )
+
         if self.index is not None:
             return u'<html><body>{0:s}</body></html>'.format(self.index())
         else:
