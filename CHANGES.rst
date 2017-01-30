@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.3.0 (unreleased)
+2.3.0 (2017-01-30)
 ------------------
 
 - Add theme fragment tile to use ESI rendering when ESI rendering
