@@ -4,7 +4,10 @@ Changelog
 2.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix issue where ESI tile rendering used public URLs breaking it
+  with HTTPS. Fixed by preferring the real request path before
+  virtual host transform.
+  [datakurre]
 
 
 2.3.0 (2017-01-30)
