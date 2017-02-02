@@ -218,6 +218,10 @@ class FragmentTile(Tile):
 
         self.update()
 
+        # Note: X-Tile-Url was added into plone.tiles.tile.Tile.__call__ to
+        # make it easier for Mosaic editor to know the URL of a new tile after
+        # receiving the redirected response from a tile form. That's why it's
+        # only set for customizable tiles (tiles with id).
         if self.id is not None:
             self.request.response.setHeader(
                 'X-Tile-Url',
