@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.3.1 (unreleased)
+2.3.1 (2017-02-02)
 ------------------
 
 - Fix issue where ESI tile rendering used public URLs breaking it
