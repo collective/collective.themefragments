@@ -211,7 +211,7 @@ class FragmentTile(Tile):
     def __call__(self):
         if self.request.getHeader(ESI_HEADER, 'false').lower() == 'true':
             return ESI_TEMPLATE.format(
-                url=self.request.getURL(),
+                url=self.request.get('PATH_INFO') or self.request.getURL(),
                 queryString=self.request.get('QUERY_STRING', ''),
                 esiMode='esi-body'
             )
