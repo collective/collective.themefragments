@@ -197,7 +197,5 @@ class ThemeFragment(BrowserPage):
         # Get settings to map fragment permissions
         permission = getFragmentsSettings(
             themeDirectory, 'themefragments:permissions').get(name) or 'zope.Public'  # noqa
-        print permission
-
 
         return FragmentView(self.context, self.request, name, permission, template)  # noqa
