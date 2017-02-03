@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.4.0 (unreleased)
+2.4.0 (2017-02-03)
 ------------------
 
 - Add ``manifest.cfg`` based configuration for setting more strict
