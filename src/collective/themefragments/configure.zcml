@@ -28,7 +28,7 @@
         for="*"
         schema=".tiles.IFragmentTile"
         class=".tiles.FragmentTile"
-        permission="zope2.View"
+        permission="zope.Public"
         add_permission="cmf.ModifyPortalContent"
         />
 

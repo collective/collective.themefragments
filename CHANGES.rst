@@ -1,10 +1,12 @@
 Changelog
 =========
 
-2.3.2 (unreleased)
+2.4.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add ``manifest.cfg`` based configuration for setting more strict
+  permissions per each fragment
+  [datakurre]
 
 
 2.3.1 (2017-02-02)

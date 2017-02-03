@@ -2,12 +2,12 @@
 from AccessControl import getSecurityManager
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.traversal import ThemeFragment
-from collective.themefragments.utils import getPluginSettings
+from collective.themefragments.utils import cache
+from collective.themefragments.utils import getFragmentsSettings
 from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
 from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
-from plone.app.theming.interfaces import IThemingPolicy
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -28,8 +28,8 @@ from plone.tiles.data import defaultTileDataStorage
 from plone.tiles.data import encode
 from plone.tiles.data import PersistentTileDataManager
 from plone.tiles.data import TransientTileDataManager
-from plone.tiles import Tile
 from plone.tiles.esi import ESI_TEMPLATE
+from plone.tiles import Tile
 from plone.tiles.interfaces import ESI_HEADER
 from plone.tiles.interfaces import IESIRendered
 from plone.tiles.interfaces import ITile
@@ -37,6 +37,7 @@ from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
 from z3c.form.form import Form
+from zExceptions import Unauthorized
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
@@ -48,7 +49,6 @@ from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
-import Globals
 import logging
 
 _ = MessageFactory('collective.themefragments')
@@ -71,32 +71,6 @@ class TileCatalogSource(CatalogSourceBase):
 
 
 CatalogSource = TileCatalogSource()
-
-
-def cache(key):
-    def wrapper(func):
-        def cached(*args, **kwargs):
-            if Globals.DevelopmentMode:
-                return func(*args, **kwargs)
-
-            request = getRequest()
-            policy = IThemingPolicy(request)
-            cache_ = policy.getCache()
-            if not hasattr(cache_, 'collective.themefragments'):
-                setattr(cache_, 'collective.themefragments', {})
-            cache_ = getattr(cache_, 'collective.themefragments')
-
-            if callable(key):
-                key_ = key(*args)
-            else:
-                key_ = key
-
-            if key_ not in cache_:
-                cache_[key_] = func(*args, **kwargs)
-            return cache_[key_]
-
-        return cached
-    return wrapper
 
 
 @implementer(IVocabularyFactory)
@@ -122,9 +96,7 @@ class ThemeFragmentsTilesVocabularyFactory(object):
             return SimpleVocabulary([])
 
         # Get settings to map titles
-        settings = getPluginSettings(
-            themeDirectory, plugins=[('themefragments:tiles', None)]
-        ).get('themefragments:tiles', {})
+        titles = getFragmentsSettings(themeDirectory, 'themefragments:tiles')
 
         tiles = [splitext(filename)[0] for filename
                  in themeDirectory[FRAGMENTS_DIRECTORY].listDirectory()
@@ -133,8 +105,8 @@ class ThemeFragmentsTilesVocabularyFactory(object):
 
         return SimpleVocabulary(
             [SimpleTerm(None, '', _(u'-- select fragment --'))] +
-            [SimpleTerm(tile, tile, settings.get(tile, tile))
-             for tile in tiles if settings.get(tile, None) is not '']
+            [SimpleTerm(tile, tile, titles.get(tile, tile))
+             for tile in tiles if titles.get(tile, None) is not '']
         )
 
 
@@ -218,6 +190,14 @@ class FragmentTile(Tile):
 
         self.update()
 
+        result = u''
+        if self.index is not None:
+            try:
+                result = self.index()
+            except Unauthorized:
+                self.request.response.setStatus(
+                    401, reason='Unauthorized', lock=True)
+
         # Note: X-Tile-Url was added into plone.tiles.tile.Tile.__call__ to
         # make it easier for Mosaic editor to know the URL of a new tile after
         # receiving the redirected response from a tile form. That's why it's
@@ -228,10 +208,7 @@ class FragmentTile(Tile):
                 self.url[len(self.context.absolute_url()) + 1:]
             )
 
-        if self.index is not None:
-            return u'<html><body>{0:s}</body></html>'.format(self.index())
-        else:
-            return u'<html></html>'
+        return u'<html><body>{0:s}</body></html>'.format(result)
 
 
 def getFragmentName(request):

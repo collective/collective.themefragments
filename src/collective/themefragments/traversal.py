@@ -2,6 +2,7 @@
 from AccessControl.ZopeGuards import get_safe_globals
 from AccessControl.ZopeGuards import guarded_getattr
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
+from collective.themefragments.utils import getFragmentsSettings
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import isThemeEnabled, getCurrentTheme
 from plone.memoize import forever
@@ -193,4 +194,10 @@ class ThemeFragment(BrowserPage):
         # Now disable the theme so we don't double-transform
         self.request.response.setHeader('X-Theme-Disabled', '1')
 
-        return FragmentView(self.context, self.request, name, 'zope.Public', template)  # noqa
+        # Get settings to map fragment permissions
+        permission = getFragmentsSettings(
+            themeDirectory, 'themefragments:permissions').get(name) or 'zope.Public'  # noqa
+        print permission
+
+
+        return FragmentView(self.context, self.request, name, permission, template)  # noqa

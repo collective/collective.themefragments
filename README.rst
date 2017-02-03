@@ -161,11 +161,21 @@ the ``href`` is using a relative path).
 Fragment security
 +++++++++++++++++
 
-Fragments, like theme HTML mockup files, are publicly accessible. Anyone with
+Fragments, like theme HTML mockup files, are publicly accessible by default.
+Anyone with
 access to the site can construct a URL containing ``@@theme-fragment/<name>`` to
 render a given fragment.
 
-However, the page templates used to build fragments execute in a so-called
+Alernatively, more strict permissions can be defined per tile in theme
+``manifest.cfg`` with syntax:
+
+.. code:: ini
+
+   [theme:themefragments:permissions]
+   basename = zope2.View
+
+However, regardless of the defined ermissions, the page templates used to build
+fragments execute in a so-called
 *Restricted Python* environment. This means that the are executed as the current
 user (or *Anonymous*, if the current user is not logged in). Information (such
 as content items or their attributes) not accessible to the current user cannot
