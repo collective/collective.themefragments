@@ -36,6 +36,7 @@ from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
+from urllib import quote
 from z3c.form.form import Form
 from zExceptions import Unauthorized
 from zope.component import adapter
@@ -181,11 +182,15 @@ class FragmentTile(Tile):
                 self.data['fragment']))
 
     def __call__(self):
+        mode = self.request.form.get('_mode') or 'body'
+
         if self.request.getHeader(ESI_HEADER, 'false').lower() == 'true':
             return ESI_TEMPLATE.format(
-                url=self.request.get('PATH_INFO') or self.request.getURL(),
+                url=(self.request.get('PATH_INFO') and
+                     self.request.get('PATH_INFO').replace(' ', '%20') or
+                     self.request.getURL()),
                 queryString=self.request.get('QUERY_STRING', ''),
-                esiMode='esi-body'
+                esiMode=mode is 'head' and 'esi-head' or 'esi-body'
             )
 
         self.update()
@@ -198,17 +203,10 @@ class FragmentTile(Tile):
                 self.request.response.setStatus(
                     401, reason='Unauthorized', lock=True)
 
-        # Note: X-Tile-Url was added into plone.tiles.tile.Tile.__call__ to
-        # make it easier for Mosaic editor to know the URL of a new tile after
-        # receiving the redirected response from a tile form. That's why it's
-        # only set for customizable tiles (tiles with id).
-        if self.id is not None:
-            self.request.response.setHeader(
-                'X-Tile-Url',
-                self.url[len(self.context.absolute_url()) + 1:]
-            )
-
-        return u'<html><body>{0:s}</body></html>'.format(result)
+        if mode is 'head':
+            return u'<html><head>{0:s}</head></html>'.format(result)
+        else:
+            return u'<html><body>{0:s}</body></html>'.format(result)
 
 
 def getFragmentName(request):
