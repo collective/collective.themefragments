@@ -4,8 +4,8 @@ Changelog
 2.4.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add support for rendering themefragment tiles as head tiles
+  [datakurre]
 
 2.4.0 (2017-02-03)
 ------------------
