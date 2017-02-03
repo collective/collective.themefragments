@@ -2,16 +2,21 @@
 from App.config import getConfiguration
 from ConfigParser import SafeConfigParser
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
-from plone.app.theming.interfaces import IThemingPolicy
 from plone.app.theming.plugins.utils import getPlugins
 from plone.resource.manifest import MANIFEST_FILENAME
 from zope.globalrequest import getRequest
+
+try:
+    from plone.app.theming.interfaces import IThemingPolicy
+    CACHE = True
+except ImportError:
+    CACHE = False
 
 
 def cache(key):
     def wrapper(func):
         def cached(*args, **kwargs):
-            if getConfiguration().debug_mode:
+            if not CACHE or getConfiguration().debug_mode:
                 return func(*args, **kwargs)
 
             request = getRequest()
