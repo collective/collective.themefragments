@@ -1,11 +1,12 @@
 Changelog
 =========
 
-2.4.1 (unreleased)
+2.5.0 (unreleased)
 ------------------
 
-- Add support for rendering themefragment tiles as head tiles
+- Add support for fragment tile -specific caching ruleset configuration
   [datakurre]
+
 
 2.4.0 (2017-02-03)
 ------------------
