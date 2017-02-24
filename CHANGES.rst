@@ -4,7 +4,8 @@ Changelog
 2.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix issue where failure in default caching ruleset lookup prevented tile ruleset lookup
+  [datakurre]
 
 
 2.5.0 (2017-02-24)
