@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.5.0 (unreleased)
+2.5.0 (2017-02-24)
 ------------------
 
 - Add support for fragment tile -specific caching ruleset configuration
