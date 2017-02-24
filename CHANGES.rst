@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.5.1 (unreleased)
+2.5.1 (2017-02-24)
 ------------------
 
 - Fix issue where failure in default caching ruleset lookup prevented tile ruleset lookup
