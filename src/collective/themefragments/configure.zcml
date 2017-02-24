@@ -88,6 +88,13 @@
         name="collective.themefragments.tiles"
         />
 
+    <adapter
+        provides="z3c.caching.registry.ICacheRule"
+        for=".tiles.IFragmentTileCacheRuleLookup"
+        factory=".tiles.FragmentTileCacheRuleFactory"
+        zcml:condition="installed z3c.caching"
+        />
+
   </configure>
 
   <!-- Profile -->

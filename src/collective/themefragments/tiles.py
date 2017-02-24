@@ -36,14 +36,15 @@ from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
-from urllib import quote
 from z3c.form.form import Form
 from zExceptions import Unauthorized
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
 from zope import schema
+from zope.interface import alsoProvides
 from zope.interface import implementer
+from zope.interface import noLongerProvides
 from zope.interface import Interface
 from zope.schema import getFields
 from zope.schema.interfaces import IVocabularyFactory
@@ -164,6 +165,10 @@ class IFragmentTile(model.Schema):
     )
 
 
+class IFragmentTileCacheRuleLookup(Interface):
+    """Marker interface for fragment specific caching lookup"""
+
+
 @implementer(IESIRendered)
 class FragmentTile(Tile):
     """A tile that displays a theme fragment"""
@@ -203,10 +208,46 @@ class FragmentTile(Tile):
                 self.request.response.setStatus(
                     401, reason='Unauthorized', lock=True)
 
+        # Note that published may be different from self, like ESIBody
+        published = self.request.get('PUBLISHED')
+        if published is not None:
+            if not IFragmentTileCacheRuleLookup.providedBy(published):
+                alsoProvides(published, IFragmentTileCacheRuleLookup)
+
         if mode is 'head':
             return u'<html><head>{0:s}</head></html>'.format(result)
         else:
             return u'<html><body>{0:s}</body></html>'.format(result)
+
+
+def FragmentTileCacheRuleFactory(obj):
+    from z3c.caching.registry import ICacheRule
+    from z3c.caching.registry import CacheRule
+
+    noLongerProvides(obj, IFragmentTileCacheRuleLookup)
+    default = ICacheRule(obj)
+    fragment = getFragmentName(getRequest())
+
+    if not fragment:
+        return default
+
+    currentTheme = getCurrentTheme()
+    if not currentTheme:
+        return default
+
+    themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)
+    if not themeDirectory:
+        return default
+
+    rulesets = getFragmentsSettings(themeDirectory, 'themefragments:caching')
+    if not rulesets:
+        return default
+
+    ruleset = rulesets.get(fragment)
+    if not ruleset:
+        return default
+
+    return CacheRule(ruleset)
 
 
 def getFragmentName(request):

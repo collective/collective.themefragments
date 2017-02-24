@@ -174,7 +174,7 @@ Alernatively, more strict permissions can be defined per tile in theme
    [theme:themefragments:permissions]
    basename = zope2.View
 
-However, regardless of the defined ermissions, the page templates used to build
+However, regardless of the defined permissions, the page templates used to build
 fragments execute in a so-called
 *Restricted Python* environment. This means that the are executed as the current
 user (or *Anonymous*, if the current user is not logged in). Information (such
@@ -202,7 +202,15 @@ Where *basename* is the basename of fragment filename (the part before
 
 Tiles can define their configuration schema using `plone.supermodel`_ XML in a
 fragment specific file having its matching filename ending with ``.xml``
-instaead of ``.pt``.
+instead of ``.pt``.
+
+It's also possible to specify fragment specific caching ruleset in
+manifest.cfg with:
+
+.. code:: ini
+
+   [theme:themefragments:caching]
+   basename = plone.content.feed
 
 .. _plone.tiles: https://pypi.python.org/pypi/plone.tiles
 .. _plone.supermodel: https://pypi.python.org/pypi/plone.supermodel
