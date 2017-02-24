@@ -225,7 +225,13 @@ def FragmentTileCacheRuleFactory(obj):
     from z3c.caching.registry import CacheRule
 
     noLongerProvides(obj, IFragmentTileCacheRuleLookup)
-    default = ICacheRule(obj)
+    try:
+        default = ICacheRule(obj, None)
+    except TypeError:
+        try:
+            default = ICacheRule(obj.context, None)
+        except (TypeError, AttributeError):
+            default = None
     fragment = getFragmentName(getRequest())
 
     if not fragment:
