@@ -185,6 +185,9 @@ class FragmentTile(Tile):
         except KeyError:
             logger.error(u"Theme fragment '{0:s}' was not found.".format(
                 self.data['fragment']))
+        except AttributeError:
+            # 'NoneType' object has no attribute 'encode'
+            logger.error(u"Theme fragment name was not specified.")
 
     def __call__(self):
         mode = self.request.form.get('_mode') or 'body'
