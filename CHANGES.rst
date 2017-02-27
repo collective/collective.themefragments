@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.5.2 (unreleased)
+2.5.2 (2017-02-27)
 ------------------
 
 - Fix issue where missing 'fragment' parameter resulted in AttributeError
