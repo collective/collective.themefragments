@@ -4,7 +4,8 @@ Changelog
 2.5.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix issue where missing 'fragment' parameter resulted in AttributeError
+  [datakurre]
 
 
 2.5.1 (2017-02-24)
