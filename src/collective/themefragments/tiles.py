@@ -51,6 +51,7 @@ from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
+import json
 import logging
 
 _ = MessageFactory('collective.themefragments')
@@ -381,9 +382,21 @@ class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
     def resolve(self, key):
         name, schema_ = super(
             LayoutAwareFragmentTileDataStorage, self).resolve(key)
-        fragment = getFragmentName(self.request)
-        return '@@{0:s}/{1:s}'.format(name, key), \
-            fragment and getFragmentSchema(fragment) or schema_
+
+        # We need to read the persisted fragment name for the right schema
+        fragment = None
+        for el in self.storage.tree.xpath(
+                '//*[contains(@data-tile, "{0:s}")]'.format(name)):
+            try:
+                data = json.loads(el.get('data-tiledata') or '{}')
+                fragment = data.get('fragment')
+            except ValueError:
+                pass
+            break
+        if not fragment:
+            fragment = getFragmentName(self.request)
+
+        return name, fragment and getFragmentSchema(fragment) or schema_
 
 
 class FragmentTileDataManager(TransientTileDataManager):
