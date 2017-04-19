@@ -1,10 +1,12 @@
 Changelog
 =========
 
-2.5.3 (unreleased)
+2.6.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Change fragment tile to prefer persistent configuratio over query
+  string configuration when choosing the configured fragment
+  [datakurre]
 
 
 2.5.2 (2017-02-27)
