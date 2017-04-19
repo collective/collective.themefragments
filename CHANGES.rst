@@ -4,7 +4,8 @@ Changelog
 2.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix to read fragment name from tile data before selecting cache rule
+  [datakurre]
 
 
 2.6.0 (2017-04-19)
