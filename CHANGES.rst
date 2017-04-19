@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.0 (unreleased)
+2.6.0 (2017-04-19)
 ------------------
 
 - Change fragment tile to prefer persistent configuratio over query
