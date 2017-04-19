@@ -236,7 +236,10 @@ def FragmentTileCacheRuleFactory(obj):
             default = ICacheRule(obj.context, None)
         except (TypeError, AttributeError):
             default = None
-    fragment = getFragmentName(getRequest())
+    try:
+        fragment = obj.context.data['fragment']
+    except (AttributeError, KeyError):
+        fragment = getFragmentName(getRequest())
 
     if not fragment:
         return default
