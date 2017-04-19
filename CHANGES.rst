@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.1 (unreleased)
+2.6.1 (2017-04-19)
 ------------------
 
 - Fix to read fragment name from tile data before selecting cache rule
