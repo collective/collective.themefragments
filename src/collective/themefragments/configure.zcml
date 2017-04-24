@@ -43,7 +43,7 @@
     <adapter
         for=".tiles.FragmentTile"
         provides="plone.tiles.interfaces.ITileDataManager"
-        factory=".tiles.FragmentTileDataManager"
+        factory=".tiles.fragmentTileDataManagerFactory"
         />
 
     <adapter

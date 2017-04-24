@@ -17,6 +17,8 @@ from plone.app.tiles.browser.edit import DefaultEditForm
 from plone.app.tiles.browser.edit import DefaultEditView
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
 from plone.memoize.view import memoize
+from plone.namedfile.field import INamedBlobImageField
+from plone.namedfile.field import INamedBlobFileField
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
 from plone.supermodel.interfaces import ISchemaPolicy
@@ -38,6 +40,7 @@ from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
 from z3c.form.form import Form
 from zExceptions import Unauthorized
+from zope.annotation import IAnnotations
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
@@ -155,6 +158,15 @@ def getFragmentSchema(name):
     for schema_ in getFragmentSchemata(name):
         return schema_
     return None
+
+
+def hasPersistentFields(schema):
+    for name in schema.names():
+        if INamedBlobImageField.providedBy(schema[name]):
+            return True
+        elif INamedBlobFileField.providedBy(schema[name]):
+            return True
+    return False
 
 
 class IFragmentTile(model.Schema):
@@ -373,7 +385,10 @@ def fragmentTileDataManagerFactory(tile):
 @implementer(ITileDataStorage)
 @adapter(ILayoutBehaviorAdaptable, Interface, FragmentTile)
 def layoutAwareFragmentTileDataStorage(context, request, tile):
-    if tile.id is not None:
+    annotations = IAnnotations(context)
+    if request.get('X-Tile-Persistent') or tile.id in annotations.keys():
+        return annotations
+    elif tile.id is not None:
         return LayoutAwareFragmentTileDataStorage(context, request, tile)
     else:
         return defaultTileDataStorage(context, request, tile)
@@ -422,7 +437,12 @@ class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
         data = ITileDataManager(self.context).get()
         if data and 'fragment' in data:
             fragment = data['fragment']
-            for schema_ in getFragmentSchemata(fragment):
+            schemata = getFragmentSchemata(fragment)
+            persistent = any(map(hasPersistentFields, schemata))
+            if persistent:
+                url += '?fragment={0:s}&X-Tile-Persistent=1'.format(fragment)
+                schemata = []
+            for schema_ in schemata:
                 if '?' in url:
                     url += '&' + encode(data, schema_)
                 else:
