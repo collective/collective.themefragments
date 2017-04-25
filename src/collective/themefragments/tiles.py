@@ -26,13 +26,11 @@ from plone.tiles.absoluteurl import TransientTileAbsoluteURL
 from plone.tiles.data import decode
 from plone.tiles.data import defaultTileDataStorage
 from plone.tiles.data import encode
-from plone.tiles.data import PersistentTileDataManager
 from plone.tiles.data import TransientTileDataManager
 from plone.tiles.esi import ESI_TEMPLATE
 from plone.tiles import Tile
 from plone.tiles.interfaces import ESI_HEADER
 from plone.tiles.interfaces import IESIRendered
-from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
@@ -46,7 +44,6 @@ from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import noLongerProvides
 from zope.interface import Interface
-from zope.schema import getFields
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
@@ -361,15 +358,6 @@ class FragmentTilePermissionChecker(GenericFormFieldPermissionChecker):
         return checker(self.DEFAULT_PERMISSION, self.context)
 
 
-@adapter(ITile)
-@implementer(ITileDataManager)
-def fragmentTileDataManagerFactory(tile):
-    if tile.request.get('X-Tile-Persistent'):
-        return PersistentFragmentTileDataManager(tile)
-    else:
-        return FragmentTileDataManager(tile)
-
-
 @implementer(ITileDataStorage)
 @adapter(ILayoutBehaviorAdaptable, Interface, FragmentTile)
 def layoutAwareFragmentTileDataStorage(context, request, tile):
@@ -428,27 +416,3 @@ class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
                 else:
                     url += '?' + encode(data, schema_)
         return url
-
-
-class PersistentFragmentTileDataManager(PersistentTileDataManager):
-    def get_default_request_data(self):
-        data = super(PersistentFragmentTileDataManager, self).get_default_request_data()  # noqa
-        if data and self.key not in self.annotations and 'fragment' in data:
-            fragment = data['fragment']
-            for schema_ in getFragmentSchemata(fragment):
-                try:
-                    data.update(decode(self.tile.request.form,
-                                       schema_, missing=True))
-                except (ValueError, UnicodeDecodeError):
-                    pass
-        return data
-
-    def get(self):
-        data = super(PersistentFragmentTileDataManager, self).get()
-        if data and self.key not in self.annotations and 'fragment' in data:
-            fragment = data['fragment']
-            for schema_ in getFragmentSchemata(fragment):
-                for name, field in getFields(schema_).items():
-                    if name not in data:
-                        data[name] = field.missing_value
-        return data
