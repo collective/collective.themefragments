@@ -103,11 +103,13 @@ class ThemeFragmentsTilesVocabularyFactory(object):
                  if splitext(filename)[-1] == '.pt' and
                  themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)]
 
-        return SimpleVocabulary(
-            [SimpleTerm(None, '', _(u'-- select fragment --'))] +
-            [SimpleTerm(tile, tile, titles.get(tile, tile))
-             for tile in tiles if titles.get(tile, None) is not '']
-        )
+        terms = [SimpleTerm(None, '', _(u'-- select fragment --'))]
+        for tile in tiles:
+            title = titles.get(tile, None)
+            title = title is None and tile or title.strip().split('#')[0]
+            if title:
+                terms.append(SimpleTerm(tile, tile, title))
+        return SimpleVocabulary(terms)
 
 
 # Helper adapters
