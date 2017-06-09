@@ -4,7 +4,15 @@ Changelog
 2.6.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix issue where add form was unable to use fragment name from request
+  [datakurre]
+
+- Fix to filter comments beginning with '#' when reading tile titles
+  [datakurre]
+
+- Remove incomplete support for persistent annotation storage for theme
+  fragment tiles
+  [datakurre]
 
 
 2.6.1 (2017-04-19)
