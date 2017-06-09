@@ -317,6 +317,12 @@ class FragmentTileAddForm(DefaultAddForm):
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
 
+        # Ensure fragment value
+        if not self.widgets['fragment'].value:
+            fragment = getFragmentName(self.request)
+            if fragment:
+                self.widgets['fragment'].value = [fragment]
+
 
 class FragmentTileEditForm(DefaultEditForm):
     """Fragment tile edit form"""
@@ -342,6 +348,12 @@ class FragmentTileEditForm(DefaultEditForm):
         Form.updateWidgets(self, prefix=self.widgetPrefix)
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
+
+        # Ensure fragment value
+        if not self.widgets['fragment'].value:
+            fragment = getFragmentName(self.request)
+            if fragment:
+                self.widgets['fragment'].value = [fragment]
 
 
 class FragmentTileAddView(DefaultAddView):
