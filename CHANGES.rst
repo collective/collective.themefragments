@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.2 (unreleased)
+2.7.0 (2017-06-09)
 ------------------
 
 - Fix issue where add form was unable to use fragment name from request

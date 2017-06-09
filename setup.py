@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='collective.themefragments',
-    version='2.6.2.dev0',
+    version='2.7.0',
     description='Theme fragments for plone.app.theming',
     long_description=(open('README.rst').read() + '\n' +
                       open('CHANGES.rst').read()),
