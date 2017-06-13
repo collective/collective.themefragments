@@ -419,14 +419,17 @@ class FragmentTileDataManager(TransientTileDataManager):
 
 
 class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
+    @memoize
     def __str__(self):
         url = super(FragmentTileAbsoluteURL, self).__str__().split('?')[0]
         data = ITileDataManager(self.context).get()
         if data and 'fragment' in data:
             fragment = data['fragment']
-            for schema_ in getFragmentSchemata(fragment):
+            if fragment:
                 if '?' in url:
-                    url += '&' + encode(data, schema_)
+                    url += '&fragment=' + fragment
                 else:
-                    url += '?' + encode(data, schema_)
+                    url += '?fragment=' + fragment
+                for schema_ in getFragmentSchemata(fragment):
+                    url += '&' + encode(data, schema_)
         return url
