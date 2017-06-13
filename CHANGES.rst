@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.1 (unreleased)
+2.7.1 (2017-06-13)
 ------------------
 
 - Fix issue where fragment tile URL did not include selected fragment itself
