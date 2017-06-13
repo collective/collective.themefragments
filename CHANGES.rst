@@ -4,7 +4,8 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix issue where fragment tile URL did not include selected fragment itself
+  [datakurre]
 
 
 2.7.0 (2017-06-09)
