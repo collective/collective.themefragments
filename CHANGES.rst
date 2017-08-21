@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.2 (unreleased)
+2.8.0 (2017-08-21)
 ------------------
 
 - Add traversable @@output_relative_to helper for RichTextValue object to
