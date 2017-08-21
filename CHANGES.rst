@@ -4,7 +4,9 @@ Changelog
 2.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add traversable @@output_relative_to helper for RichTextValue object to
+  support rendering rich text field values in restricted templates
+  [datakurre]
 
 
 2.7.1 (2017-06-13)
