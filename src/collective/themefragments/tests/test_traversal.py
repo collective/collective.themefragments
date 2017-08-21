@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 from collective.themefragments.testing import COLLECTIVE_THEMEFRAGMENTS_FUNCTIONAL_TESTING  # noqa
 from plone.app.theming.interfaces import IThemeSettings
+from plone.app.theming.interfaces import IThemingLayer
 from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
 from urllib2 import HTTPError
 from zope.component import getUtility
+from zope.component import getMultiAdapter
+from zope.interface import alsoProvides
+
 import Globals
 import transaction
 import unittest
+
+try:
+    from plone.app.textfield import RichTextValue
+    HAS_RICH_TEXT_VALUE = True
+except ImportError:
+    HAS_RICH_TEXT_VALUE = True
+    pass
 
 
 class TestCase(unittest.TestCase):
@@ -141,3 +152,19 @@ class TestCase(unittest.TestCase):
         browser.open(portal.absolute_url())
         self.assertTrue('<div id="nav">' in browser.contents)
         self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
+
+    def test_richtextvalue_output_relative_to(self):
+        if HAS_RICH_TEXT_VALUE:
+            value = RichTextValue(
+                raw='<p>Hello World</p>',
+                mimeType='text/html',
+                outputMimeType='text/html',
+                encoding='utf-8'
+            )
+            alsoProvides(self.layer['request'], IThemingLayer)
+            adapter = getMultiAdapter((value, self.layer['request']),
+                                      name='output_relative_to')
+            self.assertEqual(
+                value.output_relative_to(self.layer['portal']),
+                adapter(self.layer['portal'])
+            )

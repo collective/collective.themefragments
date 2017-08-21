@@ -30,6 +30,7 @@ setup(
     ],
     extras_require={'test': [
         'plone.app.testing',
+        'plone.app.textfield',
     ]},
     entry_points="""
     # -*- Entry points: -*-

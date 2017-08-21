@@ -1,13 +1,28 @@
 language: python
-python:
-- 2.7
+python: 2.7
 sudo: false
-install:
-- python bootstrap.py
-- bin/buildout -N -t 3
-script:
-- bin/test
-# bin/code-analysis
+env:
+  - PLONE_VERSION=4.2.x
+  - PLONE_VERSION=4.3.x
+  - PLONE_VERSION=5.x
 cache:
+  pip: true
   directories:
-  - eggs
+    - eggs
+matrix:
+  fast_finish: true
+before_install:
+  - pip install zc.buildout
+  - cp test-$PLONE_VERSION.cfg buildout.cfg
+install:
+  - buildout -N -t 3 annotate
+  - buildout -N -t 3
+script:
+  - bin/code-analysis
+  - bin/test
+after_success:
+  - bin/createcoverage
+  - pip install -q coveralls
+  - coveralls
+notifications:
+  irc: irc.freenode.org#plone-testing

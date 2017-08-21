@@ -16,6 +16,19 @@
       permission="zope.Public"
       />
 
+  <!-- RichTextValue/@@output_relative_to -helper -->
+  <browser:page
+      name="output_relative_to"
+      for="plone.app.textfield.RichTextValue"
+      layer="plone.app.theming.interfaces.IThemingLayer"
+      class=".traversal.OutputRelativeToView"
+      permission="zope.Public"
+      zcml:condition="installed plone.app.textfield"
+      />
+  <!-- Note: View for RichTextValue cannot be protected,
+       because RichTextValue is not acquisition wrapped.
+       It can only be protected on attribute access. -->
+
   <!-- Tile -->
   <configure zcml:condition="installed plone.tiles">
 

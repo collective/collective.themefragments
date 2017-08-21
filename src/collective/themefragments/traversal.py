@@ -12,6 +12,7 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from RestrictedPython import compile_restricted_function
 from zExceptions import NotFound
 from zExceptions import Unauthorized
+from zope.component.hooks import getSite
 from zope.browser.interfaces import IBrowserView
 from zope.interface import implements
 from zope.publisher.browser import BrowserPage
@@ -141,6 +142,17 @@ class FragmentView(BrowserPage):
         except NotFound, e:
             # We don't want 404's for these - they are programming errors
             raise Exception(e)
+
+
+class OutputRelativeToView(BrowserPage):
+    """Implements @@output_relative_to view for RichTextValue to make
+    it easier to render RichTextValues properly in restricted context
+    """
+
+    def __call__(self, context=None):
+        if context is None:
+            context = getSite()
+        return self.context.output_relative_to(context)
 
 
 class ThemeFragment(BrowserPage):
