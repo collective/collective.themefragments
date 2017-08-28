@@ -4,6 +4,10 @@ Changelog
 2.10.0 (unreleased)
 -------------------
 
+- Add ++themefragment++name -traverser to allow direct use of themefragments as
+  views
+  [datakurre]
+
 - Add fragment Python module support for fragment tile
   [datakurre]
 
