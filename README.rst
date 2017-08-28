@@ -189,6 +189,17 @@ Similarly::
 will do the same, but using the current content item as its ``context`` (i.e.
 the ``href`` is using a relative path).
 
+Fragment as views
++++++++++++++++++
+
+Fragments can also be used as content views, by setting the
+``layout``-attribute of a content object to ``++themefragent++name`` where
+*name* is the name of the fragment. Currently fragments cannot be configured to
+be visible in the display menu.
+
+**Note:** Fragments are only available for the currently active theme. When
+using fragments in your content this way, make sure the theme is enabled!
+
 Fragment security
 +++++++++++++++++
 

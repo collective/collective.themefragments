@@ -14,10 +14,12 @@ from zExceptions import NotFound
 from zExceptions import Unauthorized
 from zope.component.hooks import getSite
 from zope.browser.interfaces import IBrowserView
-from zope.interface import implements
+from zope.interface import implementer
 from zope.publisher.browser import BrowserPage
 from zope.publisher.interfaces import IPublishTraverse
 from zope.security import checkPermission
+from zope.traversing.interfaces import ITraversable
+from zope.traversing.namespace import SimpleHandler
 import Acquisition
 import logging
 import new
@@ -169,6 +171,7 @@ class OutputRelativeToView(BrowserPage):
         return self.context.output_relative_to(context)
 
 
+@implementer(IPublishTraverse)
 class ThemeFragment(BrowserPage):
     """Implements the ``@@theme-fragment`` traversal view. This allows you to
     traverse to ``.../@@theme-fragment/foobar`` to render as a view the
@@ -189,7 +192,6 @@ class ThemeFragment(BrowserPage):
     ``views.cfg`` file to require a specific permission, and the current
     user does not have this permission.
     """
-    implements(IPublishTraverse)
 
     def publishTraverse(self, request, name):
         try:
@@ -229,3 +231,15 @@ class ThemeFragment(BrowserPage):
             themeDirectory, 'themefragments:permissions').get(name) or 'zope.Public'  # noqa
 
         return FragmentView(self.context, self.request, name, permission, template, owner)  # noqa
+
+
+@implementer(ITraversable)
+class ThemeFragmentView(SimpleHandler):
+
+    def __init__(self, context, request):
+        super(ThemeFragmentView, self).__init__(context)
+        self.request = request
+        self.traverser = ThemeFragment(context, request)
+
+    def traverse(self, name, remaining):
+        return self.traverser.publishTraverse(self.request, name)

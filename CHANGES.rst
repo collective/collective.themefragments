@@ -1,11 +1,11 @@
 Changelog
 =========
 
-2.9.1 (unreleased)
-------------------
+2.10.0 (unreleased)
+-------------------
 
-- Nothing changed yet.
-
+- Add fragment Python module support for fragment tile
+  [datakurre]
 
 2.9.0 (2017-08-28)
 ------------------

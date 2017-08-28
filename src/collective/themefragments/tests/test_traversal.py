@@ -50,6 +50,20 @@ class TestCase(unittest.TestCase):
 
         self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
 
+    def test_theme_fragment_view_traverser(self):
+        app = self.layer['app']
+        portal = self.layer['portal']
+        self.settings.enabled = True
+        self.settings.currentTheme = u'collective.themefragments.tests'
+        self.settings.rules = u'/++theme++collective.themefragments.tests/rules.xml'
+
+        transaction.commit()
+
+        browser = Browser(app)
+        browser.open(portal.absolute_url() + '/++themefragment++customnav')
+
+        self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
+
     def test_scripted_theme_fragment_traverser(self):
         app = self.layer['app']
         portal = self.layer['portal']

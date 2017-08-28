@@ -7,13 +7,20 @@
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.themefragments">
 
-  <!-- Theme traverser -->
+  <!-- Theme traverser @@theme-fragment/name -->
   <browser:page
       name="theme-fragment"
       for="*"
       layer="plone.app.theming.interfaces.IThemingLayer"
       class=".traversal.ThemeFragment"
       permission="zope.Public"
+      />
+
+  <!-- View traverser ++themefragment++name -->
+  <adapter
+      name="themefragment"
+      for="* plone.app.theming.interfaces.IThemingLayer"
+      factory=".traversal.ThemeFragmentView"
       />
 
   <!-- RichTextValue/@@output_relative_to -helper -->
