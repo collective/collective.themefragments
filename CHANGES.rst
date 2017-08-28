@@ -1,11 +1,16 @@
 Changelog
 =========
 
-2.8.1 (unreleased)
+2.9.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add support for fragment Python modules (as PEP8 compatible single file
+  replacement for fragment methods support in previous versions)
+  [datakurre]
 
+- Change to make templates owned by their creator instead to inherit owner from
+  their rendered context
+  [datakurre]
 
 2.8.0 (2017-08-21)
 ------------------
