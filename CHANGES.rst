@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.9.0 (unreleased)
+2.9.0 (2017-08-28)
 ------------------
 
 - Add support for fragment Python modules (as PEP8 compatible single file
