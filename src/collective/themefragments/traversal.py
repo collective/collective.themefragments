@@ -88,11 +88,22 @@ class FragmentView(BrowserPage):
         if themeDirectory is None:
             raise AttributeError(name)
 
-        scriptPath = "%s/%s.%s.py" % (FRAGMENTS_DIRECTORY, self.__name__, name, )  # noqa
-        if not themeDirectory.isFile(scriptPath):
-            raise AttributeError(name)
+        script = None
 
-        script = themeDirectory.readFile(scriptPath)
+        scriptPath = "%s/%s.py" % (FRAGMENTS_DIRECTORY, self.__name__)
+        if themeDirectory.isFile(scriptPath):
+            script = themeDirectory.readFile(scriptPath)
+            if 'def {0:}(self'.format(name) in script:
+                script += '\n\nreturn {0:s}(self)'.format(name)
+            else:
+                script = None
+
+        scriptPath = "%s/%s.%s.py" % (FRAGMENTS_DIRECTORY, self.__name__, name)
+        if script is None and themeDirectory.isFile(scriptPath):
+            script = themeDirectory.readFile(scriptPath)
+
+        if script is None:
+            raise AttributeError(name)
 
         # Set the default PythonScript bindings as globals
         script_globals = {

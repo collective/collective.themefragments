@@ -69,8 +69,39 @@ fragment:
 You can learn more about Zope Page Template syntax
 `here <http://plone.org/documentation/tutorial/zpt/>`_.
 
+Fragment modules
+++++++++++++++++
+
+Fragment modules are Restricted Python Script modules bundled with your themes.
+Availability of methods is limited to specific fragment by naming the module
+after the fragment base name (with ``.py`` extension). Each module could
+contain any number Python function definitions, which are then made available
+as instance methods of the fragment view.
+
+For example, you could create a file ``fragments/customnav.py`` in your
+theme directory, containing::
+
+   def getnav(self):
+       return [{
+           'Title': u'My title',
+           'Description': u'My description',
+           'getIcon': 'document_icon.png'
+       }]
+
+And call it in your fragment ``fragments/customnav.pt`` like a view method::
+
+  <ul id="nav">
+    <li tal:repeat="item view/getnav">
+      <img tal:replace="structure item/getIcon" />
+      <span tal:replace="item/Title" tal:attributes="titile item/Description">Title</span>
+    </li>
+  </ul>
+
 Fragment methods
 ++++++++++++++++
+
+.. note:: Fragment methods preceded fragment modules and support for them
+          may be removed in the future.
 
 Fragment methods are Restricted Python Script files bundled with your themes.
 Availability of methods is limited to specific fragment by prefixing the
