@@ -189,8 +189,8 @@ Similarly::
 will do the same, but using the current content item as its ``context`` (i.e.
 the ``href`` is using a relative path).
 
-Fragment as views
-+++++++++++++++++
+Fragments as views
+++++++++++++++++++
 
 Fragments can also be used as content views, by setting the
 ``layout``-attribute of a content object to ``++themefragent++name`` where
