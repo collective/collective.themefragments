@@ -205,11 +205,7 @@ class FragmentTile(Tile):
 
         result = u''
         if self.index is not None:
-            try:
-                result = self.index()
-            except Unauthorized:
-                self.request.response.setStatus(
-                    401, reason='Unauthorized', lock=True)
+            result = self.index()
 
         # Note that published may be different from self, like ESIBody
         published = self.request.get('PUBLISHED')
