@@ -177,6 +177,9 @@ class FragmentTile(Tile):
         super(FragmentTile, self).__init__(context, request)
         self.index = None
 
+    def __getattr__(self, name):
+        return getattr(self.index, name)
+
     def update(self):
         try:
             self.index = ThemeFragment(self.context, self.request)[
