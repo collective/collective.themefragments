@@ -55,14 +55,14 @@ def prepare_restricted_function(p, body, name, filename, globalize=None):
 # noinspection PyPep8Naming
 class FragmentView(BrowserPage):
     """View class for template-based views defined in the theme.
-    When you traverse to ``..../@@theme-fragment/foobar`` to render the view
+    When you traverse to ``.../@@theme-fragment/foobar`` to render the view
     defined in ``fragments/foobar.pt`` in the theme, this becomes the ``view``.
     """
 
     # Allow bound restricted python methods to call each other
     __allow_access_to_unprotected_subobjects__ = 1
 
-    def __init__(self, context, request, name, permission, template):
+    def __init__(self, context, request, name, permission, template, owner=None):  # noqa
         # Fix issue where context is a template based view class
         while IBrowserView.providedBy(context):
             context = Acquisition.aq_parent(Acquisition.aq_inner(context))
@@ -71,6 +71,7 @@ class FragmentView(BrowserPage):
         self.__name__ = name
         self._permission = permission
         self._template = template
+        self._owner = owner
 
     # noinspection PyPep8Naming,PyUnresolvedReferences
     def __getattr__(self, name):
@@ -136,6 +137,8 @@ class FragmentView(BrowserPage):
             'portal_url': portal_url(),
             'portal': portal_url.getPortalObject(),
         }
+        if self._owner is not None:
+            zpt.changeOwnership(self._owner)
         zpt = zpt.__of__(self.context)
         try:
             return zpt._exec(boundNames, args, kwargs)
@@ -201,6 +204,10 @@ class ThemeFragment(BrowserPage):
         if not themeDirectory.isFile(templatePath):
             raise KeyError(name)
 
+        try:
+            owner = themeDirectory[templatePath].getOwner()
+        except AttributeError:
+            owner = getSite().getOwner()
         template = themeDirectory.readFile(templatePath).decode('utf-8', 'replace')  # noqa
 
         # Now disable the theme so we don't double-transform
@@ -210,4 +217,4 @@ class ThemeFragment(BrowserPage):
         permission = getFragmentsSettings(
             themeDirectory, 'themefragments:permissions').get(name) or 'zope.Public'  # noqa
 
-        return FragmentView(self.context, self.request, name, permission, template)  # noqa
+        return FragmentView(self.context, self.request, name, permission, template, owner)  # noqa
