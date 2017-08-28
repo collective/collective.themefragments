@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.10.0 (unreleased)
+2.10.0 (2017-08-28)
 -------------------
 
 - Add ++themefragment++name -traverser to allow direct use of themefragments as
