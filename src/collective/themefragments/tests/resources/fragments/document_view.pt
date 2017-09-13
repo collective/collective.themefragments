@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+<body>
+
+<metal:title fill-slot="content-title">
+  <metal:title define-slot="content-title">
+    <h1 class="documentFirstHeading"
+         tal:define="title context/Title"
+         tal:condition="title">
+     <span tal:replace="view/getPortalType">Page</span>:
+     <span tal:replace="title">Title or id</span>
+    </h1>
+  </metal:title>
+</metal:title>
+
+<metal:content-core fill-slot="content-core">
+  <metal:content-core define-macro="content-core"
+                      tal:define="widgets nocall:context/@@view">
+
+    <div tal:replace="structure widgets/++widget++IRichText.text/render">
+      This will be replaced with the rendered content of the field.
+    </div>
+
+  </metal:content-core>
+</metal:content-core>
+
+</body>
+</html>
