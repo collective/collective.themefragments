@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.10.1 (unreleased)
+2.10.1 (2017-09-13)
 -------------------
 
 - Fix issue where tile id and url were not accessible from tile fragment templates
