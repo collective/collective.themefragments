@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.10.2 (unreleased)
+2.10.2 (2017-09-24)
 -------------------
 
 - Fix issue where theming was disabled for frament views
