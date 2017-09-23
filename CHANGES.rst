@@ -4,8 +4,8 @@ Changelog
 2.10.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Fix issue where theming was disabled for frament views
+  [datakurre]
 
 2.10.1 (2017-09-13)
 -------------------
