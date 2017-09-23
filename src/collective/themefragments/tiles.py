@@ -184,6 +184,8 @@ class FragmentTile(Tile):
         try:
             self.index = ThemeFragment(self.context, self.request)[
                 self.data['fragment'].encode('utf-8')]
+            self.index.id = self.id
+            self.index.url = self.url
             self.index.data = self.data
         except KeyError:
             logger.error(u"Theme fragment '{0:s}' was not found.".format(

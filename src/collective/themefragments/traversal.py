@@ -193,6 +193,10 @@ class ThemeFragment(BrowserPage):
     user does not have this permission.
     """
 
+    def __init__(self, context, request, disable_theming=True):
+        super(ThemeFragment, self).__init__(context, request)
+        self._disable_theming = disable_theming
+
     def publishTraverse(self, request, name):
         try:
             return self[name]
@@ -224,7 +228,8 @@ class ThemeFragment(BrowserPage):
         template = themeDirectory.readFile(templatePath).decode('utf-8', 'replace')  # noqa
 
         # Now disable the theme so we don't double-transform
-        self.request.response.setHeader('X-Theme-Disabled', '1')
+        if self._disable_theming:
+            self.request.response.setHeader('X-Theme-Disabled', '1')
 
         # Get settings to map fragment permissions
         permission = getFragmentsSettings(
@@ -239,7 +244,7 @@ class ThemeFragmentView(SimpleHandler):
     def __init__(self, context, request):
         super(ThemeFragmentView, self).__init__(context)
         self.request = request
-        self.traverser = ThemeFragment(context, request)
+        self.traverser = ThemeFragment(context, request, disable_theming=False)
 
     def traverse(self, name, remaining):
         return self.traverser.publishTraverse(self.request, name)

@@ -1,11 +1,17 @@
 Changelog
 =========
 
-2.10.1 (unreleased)
+2.10.2 (unreleased)
 -------------------
 
 - Nothing changed yet.
 
+
+2.10.1 (2017-09-13)
+-------------------
+
+- Fix issue where tile id and url were not accessible from tile fragment templates
+  [datakurre]
 
 2.10.0 (2017-08-28)
 -------------------
