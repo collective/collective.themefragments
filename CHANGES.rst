@@ -4,8 +4,9 @@ Changelog
 2.10.3 (unreleased)
 -------------------
 
-- Nothing changed yet.
-
+- Add 'macros' accessor for fragment view to make fragment view template macros
+  accessible and usable e.g. in classic portlets
+  [datakurre]
 
 2.10.2 (2017-09-24)
 -------------------
