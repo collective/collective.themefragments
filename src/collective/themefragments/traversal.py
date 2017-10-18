@@ -6,6 +6,7 @@ from collective.themefragments.utils import getFragmentsSettings
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import isThemeEnabled, getCurrentTheme
 from plone.memoize import forever
+from plone.memoize import view
 from plone.resource.utils import queryResourceDirectory
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
@@ -136,13 +137,26 @@ class FragmentView(BrowserPage):
         # Return the func as instancemethod
         return types.MethodType(func, self)
 
+    @view.memoize
+    def _cook_template(self):
+        zpt = ZopePageTemplate(self.__name__, text=self._template)
+        if self._owner is not None:
+            zpt.changeOwnership(self._owner)
+        zpt = zpt.__of__(self.context)
+        return zpt
+
+    @property
+    def macros(self):
+        if not checkPermission(self._permission, self.context):
+            raise Unauthorized()
+        zpt = self._cook_template()
+        return zpt.macros
+
     def __call__(self, *args, **kwargs):
         if not checkPermission(self._permission, self.context):
             raise Unauthorized()
-
+        zpt = self._cook_template()
         portal_url = getToolByName(self.context, 'portal_url')
-
-        zpt = ZopePageTemplate(self.__name__, text=self._template)
         boundNames = {
             'context': self.context,
             'request': self.request,
@@ -150,9 +164,6 @@ class FragmentView(BrowserPage):
             'portal_url': portal_url(),
             'portal': portal_url.getPortalObject(),
         }
-        if self._owner is not None:
-            zpt.changeOwnership(self._owner)
-        zpt = zpt.__of__(self.context)
         try:
             return zpt._exec(boundNames, args, kwargs)
         except NotFound, e:
@@ -161,7 +172,7 @@ class FragmentView(BrowserPage):
 
 
 class OutputRelativeToView(BrowserPage):
-    """Implements @@output_relative_to view for RichTextValue to make
+    """Implements @@output_relative_to view for RichTextValue to make
     it easier to render RichTextValues properly in restricted context
     """
 
