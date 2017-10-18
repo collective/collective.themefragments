@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.10.3 (unreleased)
--------------------
+2.11 (2017-10-18)
+-----------------
 
 - Add 'macros' accessor for fragment view to make fragment view template macros
   accessible and usable e.g. in classic portlets
