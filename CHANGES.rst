@@ -4,7 +4,9 @@ Changelog
 2.12 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fix issue where themefragment tile was unable to render head tiles with
+  &_mode=head query parameter as expected
+  [datakurre]
 
 
 2.11 (2017-10-18)
