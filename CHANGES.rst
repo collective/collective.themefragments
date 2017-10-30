@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.12 (unreleased)
------------------
+2.11.1 (2017-10-30)
+-------------------
 
 - Fix issue where themefragment tile was unable to render head tiles with
   &_mode=head query parameter as expected
