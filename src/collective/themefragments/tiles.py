@@ -203,7 +203,7 @@ class FragmentTile(Tile):
                      self.request.get('PATH_INFO').replace(' ', '%20') or
                      self.request.getURL()),
                 queryString=self.request.get('QUERY_STRING', ''),
-                esiMode=mode is 'head' and 'esi-head' or 'esi-body'
+                esiMode=mode == 'head' and 'esi-head' or 'esi-body'
             )
 
         self.update()
@@ -222,7 +222,7 @@ class FragmentTile(Tile):
             if not IFragmentTileCacheRuleLookup.providedBy(published):
                 alsoProvides(published, IFragmentTileCacheRuleLookup)
 
-        if mode is 'head':
+        if mode == 'head':
             return u'<html><head>{0:s}</head></html>'.format(result)
         else:
             return u'<html><body>{0:s}</body></html>'.format(result)
