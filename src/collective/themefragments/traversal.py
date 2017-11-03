@@ -4,9 +4,11 @@ from AccessControl.ZopeGuards import guarded_getattr
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.utils import getFragmentsSettings
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
-from plone.app.theming.utils import isThemeEnabled, getCurrentTheme
+from plone.app.theming.utils import getCurrentTheme
+from plone.app.theming.utils import isThemeEnabled
 from plone.memoize import forever
 from plone.memoize import view
+from plone.resource.directory import FilesystemResourceDirectory
 from plone.resource.utils import queryResourceDirectory
 from Products.CMFCore.utils import getToolByName
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
@@ -24,6 +26,7 @@ from zope.traversing.namespace import SimpleHandler
 import Acquisition
 import logging
 import new
+import os
 import types
 
 logger = logging.getLogger('collective.themefragments')
@@ -92,6 +95,7 @@ class FragmentView(BrowserPage):
             raise AttributeError(name)
 
         script = None
+        filename = ''
 
         scriptPath = "%s/%s.py" % (FRAGMENTS_DIRECTORY, self.__name__)
         if themeDirectory.isFile(scriptPath):
@@ -100,10 +104,18 @@ class FragmentView(BrowserPage):
                 script += '\n\nreturn {0:s}(self)'.format(name)
             else:
                 script = None
+            filename = scriptPath
 
         scriptPath = "%s/%s.%s.py" % (FRAGMENTS_DIRECTORY, self.__name__, name)
         if script is None and themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
+            filename = scriptPath
+
+        if filename and isinstance(themeDirectory,
+                                   FilesystemResourceDirectory):
+            filename = os.path.join(
+                themeDirectory.directory.encode('utf-8', 'ignore'),
+                filename)
 
         if script is None:
             raise AttributeError(name)
@@ -122,7 +134,7 @@ class FragmentView(BrowserPage):
                 'self,*args,**kwargs',
                 script or 'pass',
                 name,
-                scriptPath,
+                filename,
                 script_globals.keys()
             )
         except SyntaxError:
