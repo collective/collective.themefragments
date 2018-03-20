@@ -126,7 +126,7 @@ And call it in your fragment ``fragments/customnav.pt`` like a view method::
     </li>
   </ul>
 
-The following variables are available to the fragment method kkkkkkkused to build a
+The following variables are available to the fragment method used to build a
 fragment:
 
 ``self``
