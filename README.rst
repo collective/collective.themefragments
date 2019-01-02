@@ -193,7 +193,7 @@ Fragments as views
 ++++++++++++++++++
 
 Fragments can also be used as content views, by setting the
-``layout``-attribute of a content object to ``++themefragent++name`` where
+``layout``-attribute of a content object to ``++themefragment++name`` where
 *name* is the name of the fragment. Currently fragments cannot be configured to
 be visible in the display menu.
 
