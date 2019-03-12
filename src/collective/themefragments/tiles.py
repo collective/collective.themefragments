@@ -103,12 +103,16 @@ class ThemeFragmentsTilesVocabularyFactory(object):
                  if splitext(filename)[-1] == '.pt' and
                  themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)]
 
-        terms = [SimpleTerm(None, '', _(u'-- select fragment --'))]
+        fragment_tiles = []
         for tile in tiles:
             title = titles.get(tile, None)
             title = title is None and tile or title.strip().split('#')[0]
-            if title and not title.startswith("Hidden"):
-                terms.append(SimpleTerm(tile, tile, title))
+            if title:
+                fragment_tiles.append([title, tile])
+        
+        terms = [SimpleTerm(None, '', _(u'-- select fragment --'))]
+        fragment_tiles.sort()
+        terms = [ SimpleTerm(value=pair[1], token=pair[1], title=pair[0]) for pair in fragment_tiles ]
         return SimpleVocabulary(terms)
 
 
