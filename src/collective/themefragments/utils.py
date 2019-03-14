@@ -73,7 +73,6 @@ def getPluginSettings(themeDirectory, plugins=None):
                 parser.readfp(fp)
             else:
                 parser.read_string(fp.read().decode())
-            parser.readfp(fp)
             for section in parser.sections():
                 manifestContents[section] = {}
 
