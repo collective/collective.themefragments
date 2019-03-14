@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
+from App.config import getConfiguration
 from collective.themefragments.testing import COLLECTIVE_THEMEFRAGMENTS_FUNCTIONAL_TESTING  # noqa
 from plone.app.theming.interfaces import IThemeSettings
 from plone.app.theming.interfaces import IThemingLayer
 from plone.registry.interfaces import IRegistry
 from plone.testing.z2 import Browser
-from urllib2 import HTTPError
+from six.moves.urllib.error import HTTPError
 from zope.component import getUtility
 from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 
-import Globals
 import transaction
 import unittest
 
@@ -26,7 +26,7 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         # Enable debug mode always to ensure cache is disabled by default
-        Globals.DevelopmentMode = True
+        getConfiguration().debug_mode = True
 
         self.settings = getUtility(IRegistry).forInterface(IThemeSettings)
         self.settings.enabled = False
@@ -34,7 +34,7 @@ class TestCase(unittest.TestCase):
         transaction.commit()
 
     def tearDown(self):
-        Globals.DevelopmentMode = False
+        getConfiguration().debug_mode = False
 
     def test_theme_fragment_traverser(self):
         app = self.layer['app']
@@ -88,6 +88,7 @@ class TestCase(unittest.TestCase):
         transaction.commit()
 
         browser = Browser(app)
+        browser.handleErrors = False
         browser.open(portal.absolute_url() + '/@@theme-fragment/scripted_customnav_module')  # noqa
 
         self.assertTrue('<h2>%s</h2>' % portal.Title() in browser.contents)
@@ -105,7 +106,7 @@ class TestCase(unittest.TestCase):
 
         try:
             browser.open(portal.absolute_url() + '/@@theme-fragment/foo')
-        except HTTPError, e:
+        except HTTPError as e:
             error = e
         self.assertEqual(error.code, 404)
 
@@ -122,7 +123,7 @@ class TestCase(unittest.TestCase):
 
         try:
             browser.open(portal.absolute_url() + '/@@theme-fragment/customnav')
-        except HTTPError, e:
+        except HTTPError as e:
             error = e
         self.assertEqual(error.code, 404)
 
@@ -141,7 +142,7 @@ class TestCase(unittest.TestCase):
             # tries to use an underscore attribute, which isn't traversable
             # in restricted python
             browser.open(portal.absolute_url() + '/@@theme-fragment/invalid')
-        except HTTPError, e:
+        except HTTPError as e:
             error = e
 
         self.assertEqual(error.code, 500)
@@ -161,7 +162,7 @@ class TestCase(unittest.TestCase):
             # tries to use an underscore attribute, which isn't traversable
             # in restricted python
             browser.open(portal.absolute_url() + '/@@theme-fragment/scripted_invalid')  # noqa
-        except HTTPError, e:
+        except HTTPError as e:
             error = e
 
         self.assertEqual(error.code, 500)
@@ -181,7 +182,7 @@ class TestCase(unittest.TestCase):
             # tries to use an underscore attribute, which isn't traversable
             # in restricted python
             browser.open(portal.absolute_url() + '/@@theme-fragment/scripted_invalid_module')  # noqa
-        except HTTPError, e:
+        except HTTPError as e:
             error = e
 
         self.assertEqual(error.code, 500)

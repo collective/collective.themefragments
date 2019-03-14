@@ -21,9 +21,10 @@ from zope.publisher.interfaces import IPublishTraverse
 from zope.security import checkPermission
 from zope.traversing.interfaces import ITraversable
 from zope.traversing.namespace import SimpleHandler
+
 import Acquisition
 import logging
-import new
+import six
 import types
 
 logger = logging.getLogger('collective.themefragments')
@@ -49,10 +50,10 @@ def prepare_restricted_function(p, body, name, filename, globalize=None):
     g['__debug__'] = __debug__
     g['__name__'] = 'script'
     l = {}
-    exec code in g, l
-    f = l.values()[0]
+    exec(code, g, l)
+    f = list(l.values())[0]
 
-    return f.func_code, g, f.func_defaults or ()
+    return f.__code__, g, f.__defaults__ or ()
 
 
 # noinspection PyPep8Naming
@@ -96,6 +97,8 @@ class FragmentView(BrowserPage):
         scriptPath = "%s/%s.py" % (FRAGMENTS_DIRECTORY, self.__name__)
         if themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
+            if six.PY3 and isinstance(script, six.binary_type):
+                script = script.decode('utf8')
             if 'def {0:}(self'.format(name) in script:
                 script += '\n\nreturn {0:s}(self)'.format(name)
             else:
@@ -104,6 +107,8 @@ class FragmentView(BrowserPage):
         scriptPath = "%s/%s.%s.py" % (FRAGMENTS_DIRECTORY, self.__name__, name)
         if script is None and themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
+            if six.PY3 and isinstance(script, six.binary_type):
+                script = script.decode('utf8')
 
         if script is None:
             raise AttributeError(name)
@@ -123,7 +128,7 @@ class FragmentView(BrowserPage):
                 script or 'pass',
                 name,
                 scriptPath,
-                script_globals.keys()
+                list(script_globals.keys())
             )
         except SyntaxError:
             raise AttributeError(name)
@@ -132,7 +137,7 @@ class FragmentView(BrowserPage):
         g = g.copy()
         g.update(script_globals)
         g['__file__'] = scriptPath
-        func = new.function(code, g, None, defaults)
+        func = types.FunctionType(code, g, None, defaults)
 
         # Return the func as instancemethod
         return types.MethodType(func, self)
@@ -166,7 +171,7 @@ class FragmentView(BrowserPage):
         }
         try:
             return zpt._exec(boundNames, args, kwargs)
-        except NotFound, e:
+        except NotFound as e:
             # We don't want 404's for these - they are programming errors
             raise Exception(e)
 

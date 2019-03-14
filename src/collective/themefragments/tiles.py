@@ -50,6 +50,7 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 import json
 import logging
+import six
 
 _ = MessageFactory('collective.themefragments')
 
@@ -143,7 +144,7 @@ def getFragmentSchemata(name):
         return ()
 
     handle = themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename)
-    schemata = parse(handle, 'collective.themefragments').schemata.values()
+    schemata = list(parse(handle, 'collective.themefragments').schemata.values())
     for schema_ in schemata:
         schema_.__name__ = schema_.__name__.encode('utf-8', 'ignore')
     return schemata
@@ -283,7 +284,7 @@ def getFragmentName(request):
         last = request.getURL().split('/')[-1]
         if last.startswith(prefix):
             fragment = last[len(prefix):].split('.')[0]
-    if isinstance(fragment, unicode):
+    if isinstance(fragment, six.text_type):
         return fragment.encode('utf-8', 'replace')
     else:
         return fragment
