@@ -109,8 +109,8 @@ class ThemeFragmentsTilesVocabularyFactory(object):
             title = title is None and tile or title.strip().split('#')[0]
             if title and not title.startswith("Hidden"):
                 fragment_tiles.append([title, tile])
-        
-        terms = [SimpleTerm(None, '', _(u'-- select fragment --'))]
+
+        fragment_tiles.append([_(u'-- select fragment --'), None ])
         fragment_tiles.sort()
         terms = [ SimpleTerm(value=pair[1], token=pair[1], title=pair[0]) for pair in fragment_tiles ]
         return SimpleVocabulary(terms)
