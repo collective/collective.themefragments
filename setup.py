@@ -32,11 +32,14 @@ setup(
     install_requires=[
         'plone.app.theming',
         'setuptools',
+        # Plone 4.3.x compatiblility
+        'plone.app.widgets',
     ],
     extras_require={'test': [
         'plone.app.testing',
         'plone.app.textfield',
-        'plone.app.blocks',
+        'plone.app.blocks>=4.0.0',
+        'plone.app.tiles',
     ]},
     entry_points="""
     # -*- Entry points: -*-

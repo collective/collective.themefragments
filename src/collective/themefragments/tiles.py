@@ -7,7 +7,6 @@ from collective.themefragments.utils import getFragmentsSettings
 from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
-from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -47,6 +46,12 @@ from zope.interface import Interface
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+
+try:
+    from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker  # noqa: E501
+except ImportError:
+    # Plone 4.3.x compatibility
+    from plone.app.widgets.dx import DXAddViewFieldPermissionChecker as GenericFormFieldPermissionChecker  # noqa: E501
 
 import json
 import logging
