@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from App.config import getConfiguration
-from six.moves.configparser import SafeConfigParser
+from six.moves.configparser import ConfigParser
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.plugins.utils import getPlugins
 from plone.resource.manifest import MANIFEST_FILENAME
@@ -65,7 +65,7 @@ def getPluginSettings(themeDirectory, plugins=None):
     manifestContents = {}
 
     if themeDirectory.isFile(MANIFEST_FILENAME):
-        parser = SafeConfigParser()
+        parser = ConfigParser()
         fp = themeDirectory.openFile(MANIFEST_FILENAME)
 
         try:

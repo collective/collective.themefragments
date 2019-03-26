@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from AccessControl import getSecurityManager
+from Products.CMFPlone.utils import safe_unicode
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.traversal import ThemeFragment
 from collective.themefragments.utils import cache
@@ -21,13 +22,13 @@ from plone.supermodel import model
 from plone.supermodel.interfaces import ISchemaPolicy
 from plone.supermodel.parser import DefaultSchemaPolicy
 from plone.supermodel.parser import parse
+from plone.tiles import Tile
 from plone.tiles.absoluteurl import TransientTileAbsoluteURL
+from plone.tiles.data import TransientTileDataManager
 from plone.tiles.data import decode
 from plone.tiles.data import defaultTileDataStorage
 from plone.tiles.data import encode
-from plone.tiles.data import TransientTileDataManager
 from plone.tiles.esi import ESI_TEMPLATE
-from plone.tiles import Tile
 from plone.tiles.interfaces import ESI_HEADER
 from plone.tiles.interfaces import IESIRendered
 from plone.tiles.interfaces import ITileDataManager
@@ -35,14 +36,14 @@ from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
 from z3c.form.form import Form
 from zExceptions import Unauthorized
+from zope import schema
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
-from zope import schema
+from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import noLongerProvides
-from zope.interface import Interface
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
@@ -129,7 +130,7 @@ class FragmentSchemaPolicy(DefaultSchemaPolicy):
 def getFragmentSchemata(name):
     """Get matching XML schema for theme fragment"""
     request = getRequest()
-    filename = (u'{0:s}.xml'.format(name)).encode('utf-8', 'ignore')
+    filename = '{0}.xml'.format(name)
 
     if not isThemeEnabled(request):
         return SimpleVocabulary([])
@@ -148,10 +149,9 @@ def getFragmentSchemata(name):
     if not themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename):
         return ()
 
-    handle = themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename)
-    schemata = list(parse(handle, 'collective.themefragments').schemata.values())
-    for schema_ in schemata:
-        schema_.__name__ = schema_.__name__.encode('utf-8', 'ignore')
+    with themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename) as handle:
+        schemata = parse(handle, 'collective.themefragments').schemata.values()
+
     return schemata
 
 
@@ -189,12 +189,13 @@ class FragmentTile(Tile):
     def update(self):
         try:
             self.index = ThemeFragment(self.context, self.request)[
-                self.data['fragment'].encode('utf-8')]
+                self.data['fragment']]
             self.index.id = self.id
             self.index.url = self.url
             self.index.data = self.data
         except KeyError:
-            logger.error(u"Theme fragment '{0:s}' was not found.".format(
+            raise
+            logger.error(u"Theme fragment '{0}' was not found.".format(
                 self.data['fragment']))
         except AttributeError:
             # 'NoneType' object has no attribute 'encode'
@@ -229,9 +230,9 @@ class FragmentTile(Tile):
                 alsoProvides(published, IFragmentTileCacheRuleLookup)
 
         if mode == 'head':
-            return u'<html><head>{0:s}</head></html>'.format(result)
+            return u'<html><head>{0}</head></html>'.format(result)
         else:
-            return u'<html><body>{0:s}</body></html>'.format(result)
+            return u'<html><body>{0}</body></html>'.format(result)
 
 
 def FragmentTileCacheRuleFactory(obj):
@@ -289,10 +290,7 @@ def getFragmentName(request):
         last = request.getURL().split('/')[-1]
         if last.startswith(prefix):
             fragment = last[len(prefix):].split('.')[0]
-    if isinstance(fragment, six.text_type):
-        return fragment.encode('utf-8', 'replace')
-    else:
-        return fragment
+    return safe_unicode(fragment)
 
 
 class PrefixedGroup(Group):
@@ -402,7 +400,7 @@ class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
         # We need to read the persisted fragment name for the right schema
         fragment = None
         for el in self.storage.tree.xpath(
-                '//*[contains(@data-tile, "{0:s}")]'.format(name)):
+                '//*[contains(@data-tile, "{0}")]'.format(name)):
             try:
                 data = json.loads(el.get('data-tiledata') or '{}')
                 fragment = data.get('fragment')
