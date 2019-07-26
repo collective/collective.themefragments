@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.12 (unreleased)
--------------------
+2.12 (2019-07-26)
+-----------------
 
 - Add support for Python 3 and Plone 5.2.
   [pbauer]
