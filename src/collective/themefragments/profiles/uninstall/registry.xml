@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<registry>
+  <!-- Legacy tile registration -->
+  <record name="plone.app.tiles">
+    <value>
+      <element remove="true">collective.themefragment.fragment</element>
+    </value>
+  </record>
+
+  <!-- Mosaic tile registration -->
+  <records prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
+           interface="plone.app.mosaic.interfaces.ITile" remove="true" />
+
+  <record name="plone.app.mosaic.app_tiles.collective.themefragments_fragment.available_actions" remove="true" />
+
+</registry>

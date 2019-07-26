@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from App.config import getConfiguration
-from ConfigParser import SafeConfigParser
+from six.moves.configparser import ConfigParser
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.plugins.utils import getPlugins
 from plone.resource.manifest import MANIFEST_FILENAME
 from zope.globalrequest import getRequest
+
+import six
 
 try:
     from plone.app.theming.interfaces import IThemingPolicy
@@ -63,11 +65,14 @@ def getPluginSettings(themeDirectory, plugins=None):
     manifestContents = {}
 
     if themeDirectory.isFile(MANIFEST_FILENAME):
-        parser = SafeConfigParser()
+        parser = ConfigParser()
         fp = themeDirectory.openFile(MANIFEST_FILENAME)
 
         try:
-            parser.readfp(fp)
+            if six.PY2:
+                parser.readfp(fp)
+            else:
+                parser.read_string(fp.read().decode())
             for section in parser.sections():
                 manifestContents[section] = {}
 

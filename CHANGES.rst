@@ -1,10 +1,11 @@
 Changelog
 =========
 
-2.11.2 (unreleased)
+2.12 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add support for Python 3 and Plone 5.2.
+  [pbauer]
 
 
 2.11.1 (2017-10-30)
