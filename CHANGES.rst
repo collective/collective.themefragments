@@ -4,7 +4,8 @@ Changelog
 2.13.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix issue unicode str conversion in FragmentTileAddForm, encode the fragmentname, if needed
+  [1letter]
 
 
 2.12 (2019-07-26)
