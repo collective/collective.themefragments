@@ -23,6 +23,7 @@ matrix:
       dist: xenial
       sudo: true
 cache:
+  pip: true
   directories:
   - eggs
   - downloads
