@@ -318,6 +318,8 @@ class FragmentTileAddForm(DefaultAddForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
+            if six.PY2 and isinstance(fragment, six.text_type):
+                fragment = fragment.encode('utf8')
             prefix = 'collective.themefragments.' + fragment
         return prefix
 
@@ -350,6 +352,8 @@ class FragmentTileEditForm(DefaultEditForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
+            if six.PY2 and isinstance(fragment, six.text_type):
+                fragment = fragment.encode('utf8')
             prefix = 'collective.themefragments.' + fragment
         return prefix
 

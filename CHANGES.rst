@@ -4,7 +4,10 @@ Changelog
 2.13.1 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix issue unicode str conversion in FragmentTileAddForm and FragmentTileEditForm, encode the fragmentname, if needed
+- Update travis config, remove the cache for pip, because travis failed with a "segfault"
+- Update CHANGES.rst
+  [1letter]
 
 
 2.12 (2019-07-26)
