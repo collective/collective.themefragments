@@ -80,6 +80,14 @@ class TileCatalogSource(CatalogSourceBase):
 CatalogSource = TileCatalogSource()
 
 
+class FragmentTileVocabulary(SimpleVocabulary):
+    """Vocabulary, which falsely claims to include everything, because
+    otherwise tile data with removed fragmets cannot be deserialized.
+    """
+    def __contains__(self, value):
+        return True  # Always contains to allow lazy handling of removed fragments
+
+
 @implementer(IVocabularyFactory)
 class ThemeFragmentsTilesVocabularyFactory(object):
     """Return vocabulary of available theme fragments to be used as tiles"""
@@ -116,7 +124,7 @@ class ThemeFragmentsTilesVocabularyFactory(object):
             title = title is None and tile or title.strip().split('#')[0]
             if title and not title.startswith("Hidden"):
                 terms.append(SimpleTerm(tile, tile, title))
-        return SimpleVocabulary(terms)
+        return FragmentTileVocabulary(sorted(terms, key=lambda x: x.title))
 
 
 # Helper adapters
@@ -149,8 +157,15 @@ def getFragmentSchemata(name):
     if not themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename):
         return ()
 
-    with themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename) as handle:
-        schemata = parse(handle, 'collective.themefragments').schemata.values()
+    if six.PY2: 
+        handle = themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename)
+        try:
+            schemata = parse(handle, 'collective.themefragments').schemata.values()
+        finally:
+            handle.close()
+    else:
+        with themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename) as handle:
+            schemata = parse(handle, 'collective.themefragments').schemata.values()
 
     return schemata
 
@@ -298,6 +313,8 @@ class PrefixedGroup(Group):
 
     def updateWidgets(self, prefix=None):
         prefix = prefix or self.parentForm.widgetPrefix
+        if six.PY2 and isinstance(prefix, six.text_type):
+            prefix = prefix.encode('utf-8')
         super(PrefixedGroup, self).updateWidgets(prefix=prefix)
 
 
@@ -316,15 +333,23 @@ class FragmentTileAddForm(DefaultAddForm):
     @memoize
     def widgetPrefix(self):
         prefix = self.tileType.__name__
+        if six.PY2 and isinstance(prefix, six.text_type):
+            prefix = prefix.encode('utf8')
+
         fragment = getFragmentName(self.request)
         if fragment:
             if six.PY2 and isinstance(fragment, six.text_type):
                 fragment = fragment.encode('utf8')
             prefix = 'collective.themefragments.' + fragment
+
         return prefix
 
     def updateWidgets(self, prefix=None):
-        Form.updateWidgets(self, prefix=self.widgetPrefix)
+        prefix = self.widgetPrefix
+        if six.PY2 and isinstance(prefix, six.text_type):
+            prefix = prefix.encode('utf-8')
+
+        Form.updateWidgets(self, prefix=prefix)
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
 
@@ -350,15 +375,23 @@ class FragmentTileEditForm(DefaultEditForm):
     @memoize
     def widgetPrefix(self):
         prefix = self.tileType.__name__
+        if six.PY2 and isinstance(prefix, six.text_type):
+            prefix = prefix.encode('utf8')
+
         fragment = getFragmentName(self.request)
         if fragment:
             if six.PY2 and isinstance(fragment, six.text_type):
                 fragment = fragment.encode('utf8')
             prefix = 'collective.themefragments.' + fragment
+
         return prefix
 
     def updateWidgets(self, prefix=None):
-        Form.updateWidgets(self, prefix=self.widgetPrefix)
+        prefix = self.widgetPrefix
+        if six.PY2 and isinstance(prefix, six.text_type):
+            prefix = prefix.encode('utf-8')
+
+        Form.updateWidgets(self, prefix=prefix)
         self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
         self.widgets['fragment'].update()
 
