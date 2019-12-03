@@ -80,6 +80,14 @@ class TileCatalogSource(CatalogSourceBase):
 CatalogSource = TileCatalogSource()
 
 
+class FragmentTileVocabulary(SimpleVocabulary):
+    """Vocabulary, which falsely claims to include everything, because
+    otherwise tile data with removed fragmets cannot be deserialized.
+    """
+    def __contains__(self, value):
+        return True  # Always contains to allow lazy handling of removed fragments
+
+
 @implementer(IVocabularyFactory)
 class ThemeFragmentsTilesVocabularyFactory(object):
     """Return vocabulary of available theme fragments to be used as tiles"""
@@ -116,7 +124,7 @@ class ThemeFragmentsTilesVocabularyFactory(object):
             title = title is None and tile or title.strip().split('#')[0]
             if title and not title.startswith("Hidden"):
                 terms.append(SimpleTerm(tile, tile, title))
-        return SimpleVocabulary(terms)
+        return FragmentTileVocabulary(sorted(terms, key=lambda x: x.title))
 
 
 # Helper adapters
