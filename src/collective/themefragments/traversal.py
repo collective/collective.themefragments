@@ -32,6 +32,9 @@ logger = logging.getLogger('collective.themefragments')
 
 @forever.memoize
 def prepare_restricted_function(p, body, name, filename, globalize=None):
+    if six.PY2 and isinstance(filename, six.text_type):
+        filename = filename.encode('utf-8')
+
     # We just do what they do in PythonScript...
     r = compile_restricted_function(p, body, name, filename, globalize)
 
@@ -220,6 +223,9 @@ class ThemeFragment(BrowserPage):
             raise NotFound(self, name, request)
 
     def __getitem__(self, name):
+        if six.PY2 and isinstance(name, six.text_type):
+            name = name.encode('utf-8')
+
         # Make sure a theme is enabled
         if not isThemeEnabled(self.request):
             raise KeyError(name)
