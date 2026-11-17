@@ -4,7 +4,80 @@
 [build-system]
 requires = ["setuptools>=68.2,<83", "wheel"]
 
+# START-MARKER-MANUAL-CONFIG
+# Anything from here until END-MARKER-MANUAL-CONFIG
+# will be kept by plone.meta
 
+[project]
+name = "collective.themefragments"
+version = "3.0.0.dev0"
+description = "Theme fragments for plone.app.theming"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Plone",
+    "Framework :: Plone :: 6.1",
+    "Framework :: Plone :: 6.2",
+    "Framework :: Plone :: Addon",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+license = "GPL-2.0-only"
+dynamic = ["readme"]
+requires-python = ">=3.10"
+authors = [
+    {name = "Asko Soukka", email = "asko.soukka@iki.fi"},
+]
+dependencies = [
+    "Products.CMFCore",
+    "RestrictedPython",
+    "Zope",
+    "plone.app.theming",
+    "plone.memoize",
+    "plone.resource",
+]
+keywords = ["Plone", "Diazo", "theming", "fragments"]
+
+[project.entry-points."plone.autoinclude.plugin"]
+target = "plone"
+
+[project.optional-dependencies]
+# The fragment tile: its ZCML is only loaded when plone.tiles is installed.
+tiles = [
+    "Products.CMFPlone",
+    "plone.app.blocks",
+    "plone.app.dexterity",
+    "plone.app.tiles",
+    "plone.app.vocabularies",
+    "plone.supermodel",
+    "plone.tiles",
+    "plone.z3cform",
+    "z3c.caching",
+    "z3c.form",
+]
+test = [
+    "plone.app.blocks",
+    "plone.app.testing",
+    "plone.app.textfield",
+    "plone.app.tiles",
+    "plone.testing",
+    "zope.testrunner",
+]
+
+[project.urls]
+PyPI = "https://pypi.org/project/collective.themefragments"
+Source = "https://github.com/collective/collective.themefragments"
+Issues = "https://github.com/collective/collective.themefragments/issues"
+Changelog = "https://github.com/collective/collective.themefragments/blob/master/CHANGES.md"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md", "CONTRIBUTORS.md", "CHANGES.md"], content-type = "text/markdown"}
+# END-MARKER-MANUAL-CONFIG
 
 [tool.towncrier]
 directory = "news/"
