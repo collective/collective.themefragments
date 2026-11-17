@@ -6,6 +6,7 @@ from collective.themefragments.utils import getFragmentsSettings
 from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
+from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -14,6 +15,7 @@ from plone.app.tiles.browser.add import DefaultAddView
 from plone.app.tiles.browser.edit import DefaultEditForm
 from plone.app.tiles.browser.edit import DefaultEditView
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
+from plone.base.utils import safe_text
 from plone.memoize.view import memoize
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
@@ -32,7 +34,6 @@ from plone.tiles.interfaces import IESIRendered
 from plone.tiles.interfaces import ITileDataManager
 from plone.tiles.interfaces import ITileDataStorage
 from plone.z3cform.fieldsets.group import Group
-from Products.CMFPlone.utils import safe_unicode
 from z3c.form.form import Form
 from zExceptions import Unauthorized
 from zope import schema
@@ -46,16 +47,6 @@ from zope.interface import noLongerProvides
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
-
-try:
-    from plone.app.dexterity.permissions import (  # noqa: E501
-        GenericFormFieldPermissionChecker,
-    )
-except ImportError:
-    # Plone 4.3.x compatibility
-    from plone.app.widgets.dx import (
-        DXAddViewFieldPermissionChecker as GenericFormFieldPermissionChecker,
-    )  # noqa: E501
 
 import json
 import logging
@@ -301,7 +292,7 @@ def getFragmentName(request):
         last = request.getURL().split("/")[-1]
         if last.startswith(prefix):
             fragment = last[len(prefix) :].split(".")[0]
-    return safe_unicode(fragment)
+    return safe_text(fragment)
 
 
 class PrefixedGroup(Group):

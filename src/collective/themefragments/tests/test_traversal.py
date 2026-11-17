@@ -5,7 +5,7 @@ from collective.themefragments.testing import (  # noqa
 from plone.app.theming.interfaces import IThemeSettings
 from plone.app.theming.interfaces import IThemingLayer
 from plone.registry.interfaces import IRegistry
-from plone.testing.z2 import Browser
+from plone.testing.zope import Browser
 from urllib.error import HTTPError
 from zope.component import getMultiAdapter
 from zope.component import getUtility
