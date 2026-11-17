@@ -1,8 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import find_namespace_packages
+from setuptools import setup
 
 setup(
     name='collective.themefragments',
-    version='2.13.1.dev0',
+    version='3.0.0.dev0',
     description='Theme fragments for plone.app.theming',
     long_description=(open('README.md').read() + '\n' +
                       open('CHANGES.md').read()),
@@ -11,28 +12,26 @@ setup(
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Framework :: Plone',
-        'Framework :: Plone :: 4.3',
-        'Framework :: Plone :: 5.0',
-        'Framework :: Plone :: 5.1',
-        'Framework :: Plone :: 5.2',
+        'Framework :: Plone :: 6.1',
+        'Framework :: Plone :: 6.2',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
     ],
     keywords='',
     author='Asko Soukka',
     author_email='asko.soukka@iki.fi',
     url='https://github.com/collective/collective.themefragments/',
     license='GPL',
-    packages=find_packages('src', exclude=['ez_setup']),
+    packages=find_namespace_packages('src', exclude=['ez_setup']),
     package_dir={'': 'src'},
-    namespace_packages=['collective'],
     include_package_data=True,
     zip_safe=False,
+    python_requires='>=3.10',
     install_requires=[
         'plone.app.theming',
-        'setuptools',
         # Plone 4.3.x compatiblility
         'plone.app.widgets',
     ],
