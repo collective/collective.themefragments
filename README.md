@@ -35,7 +35,7 @@ directory, containing:
 <ul id="nav">
   <li tal:repeat="item context/@@folderListing">
     <img tal:replace="structure item/getIcon" />
-    <span tal:replace="item/Title" tal:attributes="titile item/Description">Title</span>
+    <span tal:replace="item/Title" tal:attributes="title item/Description">Title</span>
   </li>
 </ul>
 ```
@@ -97,7 +97,7 @@ And call it in your fragment `fragments/customnav.pt` like a view method:
 <ul id="nav">
   <li tal:repeat="item view/getnav">
     <img tal:replace="structure item/getIcon" />
-    <span tal:replace="item/Title" tal:attributes="titile item/Description">Title</span>
+    <span tal:replace="item/Title" tal:attributes="title item/Description">Title</span>
   </li>
 </ul>
 ```
@@ -130,7 +130,7 @@ And call it in your fragment `fragments/customnav.pt` like a view method:
 <ul id="nav">
   <li tal:repeat="item view/getnav">
     <img tal:replace="structure item/getIcon" />
-    <span tal:replace="item/Title" tal:attributes="titile item/Description">Title</span>
+    <span tal:replace="item/Title" tal:attributes="title item/Description">Title</span>
   </li>
 </ul>
 ```
@@ -223,7 +223,7 @@ Anyone with
 access to the site can construct a URL containing `@@theme-fragment/<name>` to
 render a given fragment.
 
-Alernatively, more strict permissions can be defined per tile in theme
+Alternatively, more strict permissions can be defined per tile in theme
 `manifest.cfg` with syntax:
 
 ```ini

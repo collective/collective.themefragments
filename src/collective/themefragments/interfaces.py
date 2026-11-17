@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-FRAGMENTS_DIRECTORY = 'fragments'
+FRAGMENTS_DIRECTORY = "fragments"

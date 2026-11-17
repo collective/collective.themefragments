@@ -32,7 +32,7 @@
 
 ## 2.10.2 (2017-09-24)
 
-- Fix issue where theming was disabled for frament views
+- Fix issue where theming was disabled for fragment views
   [datakurre]
 
 

@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 from AccessControl.ZopeGuards import get_safe_globals
 from AccessControl.ZopeGuards import guarded_getattr
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.utils import getFragmentsSettings
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
-from plone.app.theming.utils import isThemeEnabled, getCurrentTheme
+from plone.app.theming.utils import getCurrentTheme
+from plone.app.theming.utils import isThemeEnabled
 from plone.memoize import forever
 from plone.memoize import view
 from plone.resource.utils import queryResourceDirectory
@@ -13,8 +13,8 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from RestrictedPython import compile_restricted_function
 from zExceptions import NotFound
 from zExceptions import Unauthorized
-from zope.component.hooks import getSite
 from zope.browser.interfaces import IBrowserView
+from zope.component.hooks import getSite
 from zope.interface import implementer
 from zope.publisher.browser import BrowserPage
 from zope.publisher.interfaces import IPublishTraverse
@@ -27,7 +27,7 @@ import logging
 import six
 import types
 
-logger = logging.getLogger('collective.themefragments')
+logger = logging.getLogger("collective.themefragments")
 
 
 @forever.memoize
@@ -40,18 +40,18 @@ def prepare_restricted_function(p, body, name, filename, globalize=None):
     warnings = tuple(r[2])
 
     if errors:
-        logger.warning('\n'.join(errors))
+        logger.warning("\n".join(errors))
         raise SyntaxError()
     elif warnings:
-        logger.warning('\n'.join(warnings))
+        logger.warning("\n".join(warnings))
 
     g = get_safe_globals()
-    g['_getattr_'] = guarded_getattr
-    g['__debug__'] = __debug__
-    g['__name__'] = 'script'
-    l = {}
-    exec(code, g, l)
-    f = list(l.values())[0]
+    g["_getattr_"] = guarded_getattr
+    g["__debug__"] = __debug__
+    g["__name__"] = "script"
+    namespace = {}
+    exec(code, g, namespace)
+    f = list(namespace.values())[0]
 
     return f.__code__, g, f.__defaults__ or ()
 
@@ -66,12 +66,14 @@ class FragmentView(BrowserPage):
     # Allow bound restricted python methods to call each other
     __allow_access_to_unprotected_subobjects__ = 1
 
-    def __init__(self, context, request, name, permission, template, owner=None):  # noqa
+    def __init__(
+        self, context, request, name, permission, template, owner=None
+    ):  # noqa
         # Fix issue where context is a template based view class
         while IBrowserView.providedBy(context):
             context = Acquisition.aq_parent(Acquisition.aq_inner(context))
 
-        super(FragmentView, self).__init__(context, request)
+        super().__init__(context, request)
         self.__name__ = name
         self._permission = permission
         self._template = template
@@ -79,8 +81,8 @@ class FragmentView(BrowserPage):
 
     # noinspection PyPep8Naming,PyUnresolvedReferences
     def __getattr__(self, name):
-        blacklist = ['im_func', 'func_code', 'index_html']
-        if name.startswith('_') or name in blacklist:
+        blacklist = ["im_func", "func_code", "index_html"]
+        if name.startswith("_") or name in blacklist:
             raise AttributeError(name)
 
         # Check if there is views/<self.__name__>.<name>.py in the theme, if not raise  # noqa
@@ -88,47 +90,49 @@ class FragmentView(BrowserPage):
         if currentTheme is None:
             raise AttributeError(name)
 
-        themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)  # noqa
+        themeDirectory = queryResourceDirectory(
+            THEME_RESOURCE_NAME, currentTheme
+        )  # noqa
         if themeDirectory is None:
             raise AttributeError(name)
 
         script = None
 
-        scriptPath = "%s/%s.py" % (FRAGMENTS_DIRECTORY, self.__name__)
+        scriptPath = f"{FRAGMENTS_DIRECTORY}/{self.__name__}.py"
         if themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
-            if six.PY3 and isinstance(script, six.binary_type):
-                script = script.decode('utf8')
-            if 'def {0:}(self'.format(name) in script:
-                script += '\n\nreturn {0:s}(self)'.format(name)
+            if six.PY3 and isinstance(script, bytes):
+                script = script.decode("utf8")
+            if f"def {name}(self" in script:
+                script += f"\n\nreturn {name:s}(self)"
             else:
                 script = None
 
-        scriptPath = "%s/%s.%s.py" % (FRAGMENTS_DIRECTORY, self.__name__, name)
+        scriptPath = f"{FRAGMENTS_DIRECTORY}/{self.__name__}.{name}.py"
         if script is None and themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
-            if six.PY3 and isinstance(script, six.binary_type):
-                script = script.decode('utf8')
+            if six.PY3 and isinstance(script, bytes):
+                script = script.decode("utf8")
 
         if script is None:
             raise AttributeError(name)
 
         # Set the default PythonScript bindings as globals
         script_globals = {
-            'script': self,
-            'context': self.context,
-            'container': Acquisition.aq_parent(self.context),
-            'traverse_subpath': ''
+            "script": self,
+            "context": self.context,
+            "container": Acquisition.aq_parent(self.context),
+            "traverse_subpath": "",
         }
 
-        # Build re-usable restricted function components like in PythonScript
+        # Build reusable restricted function components like in PythonScript
         try:
             code, g, defaults = prepare_restricted_function(
-                'self,*args,**kwargs',
-                script or 'pass',
+                "self,*args,**kwargs",
+                script or "pass",
                 name,
                 scriptPath,
-                list(script_globals.keys())
+                list(script_globals.keys()),
             )
         except SyntaxError:
             raise AttributeError(name)
@@ -136,7 +140,7 @@ class FragmentView(BrowserPage):
         # Update globals
         g = g.copy()
         g.update(script_globals)
-        g['__file__'] = scriptPath
+        g["__file__"] = scriptPath
         func = types.FunctionType(code, g, None, defaults)
 
         # Return the func as instancemethod
@@ -161,13 +165,13 @@ class FragmentView(BrowserPage):
         if not checkPermission(self._permission, self.context):
             raise Unauthorized()
         zpt = self._cook_template()
-        portal_url = getToolByName(self.context, 'portal_url')
+        portal_url = getToolByName(self.context, "portal_url")
         boundNames = {
-            'context': self.context,
-            'request': self.request,
-            'view': self,
-            'portal_url': portal_url(),
-            'portal': portal_url.getPortalObject(),
+            "context": self.context,
+            "request": self.request,
+            "view": self,
+            "portal_url": portal_url(),
+            "portal": portal_url.getPortalObject(),
         }
         try:
             return zpt._exec(boundNames, args, kwargs)
@@ -210,7 +214,7 @@ class ThemeFragment(BrowserPage):
     """
 
     def __init__(self, context, request, disable_theming=True):
-        super(ThemeFragment, self).__init__(context, request)
+        super().__init__(context, request)
         self._disable_theming = disable_theming
 
     def publishTraverse(self, request, name):
@@ -229,11 +233,13 @@ class ThemeFragment(BrowserPage):
         if currentTheme is None:
             raise KeyError(name)
 
-        themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)  # noqa
+        themeDirectory = queryResourceDirectory(
+            THEME_RESOURCE_NAME, currentTheme
+        )  # noqa
         if themeDirectory is None:
             raise KeyError(name)
 
-        templatePath = "%s/%s.pt" % (FRAGMENTS_DIRECTORY, name,)
+        templatePath = f"{FRAGMENTS_DIRECTORY}/{name}.pt"
         if not themeDirectory.isFile(templatePath):
             raise KeyError(name)
 
@@ -241,24 +247,30 @@ class ThemeFragment(BrowserPage):
             owner = themeDirectory[templatePath].getOwner()
         except AttributeError:
             owner = getSite().getOwner()
-        template = themeDirectory.readFile(templatePath).decode('utf-8', 'replace')  # noqa
+        template = themeDirectory.readFile(templatePath).decode(
+            "utf-8", "replace"
+        )  # noqa
 
         # Now disable the theme so we don't double-transform
         if self._disable_theming:
-            self.request.response.setHeader('X-Theme-Disabled', '1')
+            self.request.response.setHeader("X-Theme-Disabled", "1")
 
         # Get settings to map fragment permissions
-        permission = getFragmentsSettings(
-            themeDirectory, 'themefragments:permissions').get(name) or 'zope.Public'  # noqa
+        permission = (
+            getFragmentsSettings(themeDirectory, "themefragments:permissions").get(name)
+            or "zope.Public"
+        )  # noqa
 
-        return FragmentView(self.context, self.request, name, permission, template, owner)  # noqa
+        return FragmentView(
+            self.context, self.request, name, permission, template, owner
+        )  # noqa
 
 
 @implementer(ITraversable)
 class ThemeFragmentView(SimpleHandler):
 
     def __init__(self, context, request):
-        super(ThemeFragmentView, self).__init__(context)
+        super().__init__(context)
         self.request = request
         self.traverser = ThemeFragment(context, request, disable_theming=False)
 

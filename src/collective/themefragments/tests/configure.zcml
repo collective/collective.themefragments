@@ -1,10 +1,17 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:plone="http://namespaces.plone.org/plone">
+    xmlns:plone="http://namespaces.plone.org/plone"
+    >
 
-  <include package="plone.resource" file="meta.zcml" />
+  <include
+      package="plone.resource"
+      file="meta.zcml"
+      />
   <include package="plone.app.theming" />
 
-  <plone:static directory="resources" type="theme" />
+  <plone:static
+      directory="resources"
+      type="theme"
+      />
 
 </configure>
