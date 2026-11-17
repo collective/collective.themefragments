@@ -2,12 +2,32 @@
 
 <!-- towncrier release notes start -->
 
-## 2.13.1 (unreleased)
+## 3.0.0 (unreleased)
 
-- Fix issue unicode str conversion in FragmentTileAddForm and FragmentTileEditForm, encode the fragmentname, if needed
-- Update travis config, remove the cache for pip, because travis failed with a "segfault"
-- Update CHANGES.rst
-  [1letter]
+
+- Breaking: replace the `pkg_resources` namespace of `collective` with a
+  PEP 420 native namespace. Support Plone 6.1 and 6.2 only, on Python 3.10
+  to 3.13. Use 2.12 for Plone 4.3 to 6.0 and Python 2.7.
+  [remdub]
+
+- Declare what the fragment tile requires in a `tiles` extra
+  (`collective.themefragments[tiles]`). plone.app.widgets is no longer a
+  dependency: the tile field permission checker is registered for
+  `IFieldPermissionChecker` from plone.app.z3cform, also when
+  plone.app.widgets isn't installed.
+  [remdub]
+
+- Drop the Python 2 and Plone 4 code: `six`, the Python 2 encoding of the
+  fragment name in the tile forms, the plone.app.widgets fallbacks and the
+  `IThemingPolicy` import guard. Import `safe_text` from `plone.base`, and
+  use `plone.testing.zope` in the tests.
+  [remdub]
+
+- Configure the package with plone.meta 2.12.0 (test matrix on Plone 6.2.3
+  and 6.1), move its metadata to `pyproject.toml`, convert the documentation
+  to Markdown and run the development environment on Plone 6.2.3 with uv
+  instead of buildout. Drop Travis and the buildout configuration.
+  [remdub]
 
 
 ## 2.12 (2019-07-26)
