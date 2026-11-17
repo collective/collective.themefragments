@@ -24,7 +24,6 @@ from zope.traversing.namespace import SimpleHandler
 
 import Acquisition
 import logging
-import six
 import types
 
 logger = logging.getLogger("collective.themefragments")
@@ -101,7 +100,7 @@ class FragmentView(BrowserPage):
         scriptPath = f"{FRAGMENTS_DIRECTORY}/{self.__name__}.py"
         if themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
-            if six.PY3 and isinstance(script, bytes):
+            if isinstance(script, bytes):
                 script = script.decode("utf8")
             if f"def {name}(self" in script:
                 script += f"\n\nreturn {name:s}(self)"
@@ -111,7 +110,7 @@ class FragmentView(BrowserPage):
         scriptPath = f"{FRAGMENTS_DIRECTORY}/{self.__name__}.{name}.py"
         if script is None and themeDirectory.isFile(scriptPath):
             script = themeDirectory.readFile(scriptPath)
-            if six.PY3 and isinstance(script, bytes):
+            if isinstance(script, bytes):
                 script = script.decode("utf8")
 
         if script is None:

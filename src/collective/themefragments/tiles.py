@@ -50,7 +50,6 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 import json
 import logging
-import six
 
 _ = MessageFactory("collective.themefragments")
 
@@ -320,8 +319,6 @@ class FragmentTileAddForm(DefaultAddForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
-            if six.PY2 and isinstance(fragment, str):
-                fragment = fragment.encode("utf8")
             prefix = "collective.themefragments." + fragment
         return prefix
 
@@ -354,8 +351,6 @@ class FragmentTileEditForm(DefaultEditForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
-            if six.PY2 and isinstance(fragment, str):
-                fragment = fragment.encode("utf8")
             prefix = "collective.themefragments." + fragment
         return prefix
 
