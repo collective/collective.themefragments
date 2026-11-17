@@ -4,8 +4,9 @@ setup(
     name='collective.themefragments',
     version='2.13.1.dev0',
     description='Theme fragments for plone.app.theming',
-    long_description=(open('README.rst').read() + '\n' +
-                      open('CHANGES.rst').read()),
+    long_description=(open('README.md').read() + '\n' +
+                      open('CHANGES.md').read()),
+    long_description_content_type='text/markdown',
     # Get more strings from
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
