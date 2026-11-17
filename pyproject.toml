@@ -49,11 +49,12 @@ target = "plone"
 [project.optional-dependencies]
 # The fragment tile: its ZCML is only loaded when plone.tiles is installed.
 tiles = [
-    "Products.CMFPlone",
     "plone.app.blocks",
     "plone.app.dexterity",
     "plone.app.tiles",
     "plone.app.vocabularies",
+    "plone.app.z3cform",
+    "plone.base",
     "plone.supermodel",
     "plone.tiles",
     "plone.z3cform",
@@ -65,6 +66,7 @@ test = [
     "plone.app.testing",
     "plone.app.textfield",
     "plone.app.tiles",
+    "plone.registry",
     "plone.testing",
     "zope.testrunner",
 ]
@@ -197,7 +199,7 @@ Zope = [
 ]
 python-dateutil = ['dateutil']
 pytest-plone = ['pytest', 'zope.pytestlayer', 'plone.testing', 'plone.app.testing']
-ignore-packages = ['zope.testrunner']
+ignore-packages = ['zope.testrunner', 'plone.app.textfield', 'plone.app.blocks', 'plone.app.dexterity', 'plone.app.tiles', 'plone.app.vocabularies', 'plone.app.z3cform', 'plone.base', 'plone.supermodel', 'plone.tiles', 'plone.z3cform', 'z3c.caching', 'z3c.form']
 
 ##
 # Add extra configuration options in .meta.toml:
