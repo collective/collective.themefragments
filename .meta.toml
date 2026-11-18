@@ -22,7 +22,7 @@ requirements.txt
 dependencies_ignores = "['zope.testrunner', 'plone.app.textfield', 'plone.app.blocks', 'plone.app.dexterity', 'plone.app.tiles', 'plone.app.vocabularies', 'plone.app.z3cform', 'plone.base', 'plone.supermodel', 'plone.tiles', 'plone.z3cform', 'z3c.caching', 'z3c.form']"
 
 [tox]
-test_matrix = {"6.2" = ["3.13", "3.12", "3.11", "3.10"], "6.1" = ["3.13", "3.12", "3.11", "3.10"]}
+test_matrix = {"6.2" = ["3.14", "3.13", "3.12", "3.11", "3.10"], "6.1" = ["3.13", "3.12", "3.11", "3.10"]}
 constraints_files = {"6.2" = "https://dist.plone.org/release/6.2.3/constraints.txt", "6.1" = "https://dist.plone.org/release/6.1-latest/constraints.txt"}
 
 [github]

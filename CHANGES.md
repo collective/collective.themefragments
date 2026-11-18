@@ -6,8 +6,9 @@
 
 
 - Breaking: replace the `pkg_resources` namespace of `collective` with a
-  PEP 420 native namespace. Support Plone 6.1 and 6.2 only, on Python 3.10
-  to 3.13. Use 2.12 for Plone 4.3 to 6.0 and Python 2.7.
+  PEP 420 native namespace. Support Plone 6.1 only on Python 3.10 to 3.13,
+  and Plone 6.2 on Python 3.10 to 3.14. Use 2.12 for Plone 4.3 to 6.0 and
+  Python 2.7.
   [remdub]
 
 - Declare what the fragment tile requires in a `tiles` extra

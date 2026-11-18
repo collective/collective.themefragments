@@ -279,7 +279,8 @@ basename = plone.content.feed
 
 ## Compatibility
 
-Version 3.x supports Plone 6.1 and 6.2, on Python 3.10 to 3.13.
+Version 3.x supports Plone 6.1 on Python 3.10 to 3.13, and Plone 6.2 on Python
+3.10 to 3.14.
 
 For Plone 4.3 to 6.0 and Python 2.7, use collective.themefragments 2.12.
 
