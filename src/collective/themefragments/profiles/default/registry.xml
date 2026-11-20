@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
   <!-- Legacy tile registration -->
   <record name="plone.app.tiles">
@@ -12,13 +12,14 @@
   </record>
 
   <!-- Mosaic tile registration -->
-  <records prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
-           interface="plone.app.mosaic.interfaces.ITile">
+  <records interface="plone.app.mosaic.interfaces.ITile"
+           prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
+  >
     <value key="name">collective.themefragments.fragment</value>
     <value key="label">Theme fragment</value>
     <value key="category">advanced</value>
     <value key="tile_type">app</value>
-    <value key="default_value"/>
+    <value key="default_value" />
     <value key="read_only">false</value>
     <value key="settings">true</value>
     <value key="favorite">false</value>

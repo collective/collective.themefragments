@@ -1,4 +1,9 @@
-recursive-include src *
-include *.rst *.py
-exclude *.cfg
+graft src/collective
+graft news
+include *.md
+include LICENSE.GPL
+exclude Makefile
+exclude mx.ini
+exclude instance.yaml
 global-exclude *.pyc
+global-exclude .DS_Store

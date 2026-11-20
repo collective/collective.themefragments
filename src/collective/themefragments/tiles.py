@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 from AccessControl import getSecurityManager
-from Products.CMFPlone.utils import safe_unicode
 from collective.themefragments.interfaces import FRAGMENTS_DIRECTORY
 from collective.themefragments.traversal import ThemeFragment
 from collective.themefragments.utils import cache
@@ -8,6 +6,7 @@ from collective.themefragments.utils import getFragmentsSettings
 from os.path import splitext
 from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
+from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.app.theming.utils import isThemeEnabled
@@ -16,6 +15,7 @@ from plone.app.tiles.browser.add import DefaultAddView
 from plone.app.tiles.browser.edit import DefaultEditForm
 from plone.app.tiles.browser.edit import DefaultEditView
 from plone.app.vocabularies.catalog import CatalogSource as CatalogSourceBase
+from plone.base.utils import safe_text
 from plone.memoize.view import memoize
 from plone.resource.utils import queryResourceDirectory
 from plone.supermodel import model
@@ -24,10 +24,10 @@ from plone.supermodel.parser import DefaultSchemaPolicy
 from plone.supermodel.parser import parse
 from plone.tiles import Tile
 from plone.tiles.absoluteurl import TransientTileAbsoluteURL
-from plone.tiles.data import TransientTileDataManager
 from plone.tiles.data import decode
 from plone.tiles.data import defaultTileDataStorage
 from plone.tiles.data import encode
+from plone.tiles.data import TransientTileDataManager
 from plone.tiles.esi import ESI_TEMPLATE
 from plone.tiles.interfaces import ESI_HEADER
 from plone.tiles.interfaces import IESIRendered
@@ -40,27 +40,20 @@ from zope import schema
 from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.i18nmessageid import MessageFactory
-from zope.interface import Interface
 from zope.interface import alsoProvides
 from zope.interface import implementer
+from zope.interface import Interface
 from zope.interface import noLongerProvides
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
-try:
-    from plone.app.dexterity.permissions import GenericFormFieldPermissionChecker  # noqa: E501
-except ImportError:
-    # Plone 4.3.x compatibility
-    from plone.app.widgets.dx import DXAddViewFieldPermissionChecker as GenericFormFieldPermissionChecker  # noqa: E501
-
 import json
 import logging
-import six
 
-_ = MessageFactory('collective.themefragments')
+_ = MessageFactory("collective.themefragments")
 
-logger = logging.getLogger('collective.themefragments')
+logger = logging.getLogger("collective.themefragments")
 
 #
 # [theme:themefragments:tiles]
@@ -73,6 +66,7 @@ class TileCatalogSource(CatalogSourceBase):
     otherwise tile data with broken references cannot be deserialized
     (because broken reference would not be found from catalog source).
     """
+
     def __contains__(self, value):
         return True  # Always contains to allow lazy handling of removed objs
 
@@ -81,10 +75,10 @@ CatalogSource = TileCatalogSource()
 
 
 @implementer(IVocabularyFactory)
-class ThemeFragmentsTilesVocabularyFactory(object):
+class ThemeFragmentsTilesVocabularyFactory:
     """Return vocabulary of available theme fragments to be used as tiles"""
 
-    @cache('vocabulary')
+    @cache("vocabulary")
     def __call__(self, context=None):
         request = getRequest()
 
@@ -95,7 +89,9 @@ class ThemeFragmentsTilesVocabularyFactory(object):
         if currentTheme is None:
             return SimpleVocabulary([])
 
-        themeDirectory = queryResourceDirectory(THEME_RESOURCE_NAME, currentTheme)  # noqa
+        themeDirectory = queryResourceDirectory(
+            THEME_RESOURCE_NAME, currentTheme
+        )  # noqa
         if themeDirectory is None:
             return SimpleVocabulary([])
 
@@ -103,17 +99,19 @@ class ThemeFragmentsTilesVocabularyFactory(object):
             return SimpleVocabulary([])
 
         # Get settings to map titles
-        titles = getFragmentsSettings(themeDirectory, 'themefragments:tiles')
+        titles = getFragmentsSettings(themeDirectory, "themefragments:tiles")
 
-        tiles = [splitext(filename)[0] for filename
-                 in themeDirectory[FRAGMENTS_DIRECTORY].listDirectory()
-                 if splitext(filename)[-1] == '.pt' and
-                 themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)]
+        tiles = [
+            splitext(filename)[0]
+            for filename in themeDirectory[FRAGMENTS_DIRECTORY].listDirectory()
+            if splitext(filename)[-1] == ".pt"
+            and themeDirectory[FRAGMENTS_DIRECTORY].isFile(filename)
+        ]
 
-        terms = [SimpleTerm(None, '', _(u'-- select fragment --'))]
+        terms = [SimpleTerm(None, "", _("-- select fragment --"))]
         for tile in tiles:
             title = titles.get(tile, None)
-            title = title is None and tile or title.strip().split('#')[0]
+            title = title is None and tile or title.strip().split("#")[0]
             if title and not title.startswith("Hidden"):
                 terms.append(SimpleTerm(tile, tile, title))
         return SimpleVocabulary(terms)
@@ -123,14 +121,14 @@ class ThemeFragmentsTilesVocabularyFactory(object):
 @implementer(ISchemaPolicy)
 class FragmentSchemaPolicy(DefaultSchemaPolicy):
     def bases(self, schemaName, tree):
-        return IFragmentTile,
+        return (IFragmentTile,)
 
 
 @cache(lambda *args: args[0])
 def getFragmentSchemata(name):
     """Get matching XML schema for theme fragment"""
     request = getRequest()
-    filename = '{0}.xml'.format(name)
+    filename = f"{name}.xml"
 
     if not isThemeEnabled(request):
         return SimpleVocabulary([])
@@ -150,7 +148,7 @@ def getFragmentSchemata(name):
         return ()
 
     with themeDirectory[FRAGMENTS_DIRECTORY].openFile(filename) as handle:
-        schemata = parse(handle, 'collective.themefragments').schemata.values()
+        schemata = parse(handle, "collective.themefragments").schemata.values()
 
     return schemata
 
@@ -166,8 +164,8 @@ class IFragmentTile(model.Schema):
     """Generic theme fragment tile"""
 
     fragment = schema.Choice(
-        title=_(u'Theme fragment'),
-        vocabulary='collective.themefragments.tiles',
+        title=_("Theme fragment"),
+        vocabulary="collective.themefragments.tiles",
     )
 
 
@@ -180,7 +178,7 @@ class FragmentTile(Tile):
     """A tile that displays a theme fragment"""
 
     def __init__(self, context, request):
-        super(FragmentTile, self).__init__(context, request)
+        super().__init__(context, request)
         self.index = None
 
     def __getattr__(self, name):
@@ -189,55 +187,58 @@ class FragmentTile(Tile):
     def update(self):
         try:
             self.index = ThemeFragment(self.context, self.request)[
-                self.data['fragment']]
+                self.data["fragment"]
+            ]
             self.index.id = self.id
             self.index.url = self.url
             self.index.data = self.data
         except KeyError:
             raise
-            logger.error(u"Theme fragment '{0}' was not found.".format(
-                self.data['fragment']))
+            logger.error(
+                "Theme fragment '{}' was not found.".format(self.data["fragment"])
+            )
         except AttributeError:
             # 'NoneType' object has no attribute 'encode'
-            logger.error(u"Theme fragment name was not specified.")
+            logger.error("Theme fragment name was not specified.")
 
     def __call__(self):
-        mode = self.request.form.get('_mode') or 'body'
+        mode = self.request.form.get("_mode") or "body"
 
-        if self.request.getHeader(ESI_HEADER, 'false').lower() == 'true':
+        if self.request.getHeader(ESI_HEADER, "false").lower() == "true":
             return ESI_TEMPLATE.format(
-                url=(self.request.get('PATH_INFO') and
-                     self.request.get('PATH_INFO').replace(' ', '%20') or
-                     self.request.getURL()),
-                queryString=self.request.get('QUERY_STRING', ''),
-                esiMode=mode == 'head' and 'esi-head' or 'esi-body'
+                url=(
+                    self.request.get("PATH_INFO")
+                    and self.request.get("PATH_INFO").replace(" ", "%20")
+                    or self.request.getURL()
+                ),
+                queryString=self.request.get("QUERY_STRING", ""),
+                esiMode=mode == "head" and "esi-head" or "esi-body",
             )
 
         self.update()
 
-        result = u''
+        result = ""
         if self.index is not None:
             try:
                 result = self.index()
             except Unauthorized:
-                self.request.response.setStatus(
-                    401, reason='Unauthorized', lock=True)
+                self.request.response.setStatus(401, reason="Unauthorized", lock=True)
 
         # Note that published may be different from self, like ESIBody
-        published = self.request.get('PUBLISHED')
+        published = self.request.get("PUBLISHED")
         if published is not None:
             if not IFragmentTileCacheRuleLookup.providedBy(published):
                 alsoProvides(published, IFragmentTileCacheRuleLookup)
 
-        if mode == 'head':
-            return u'<html><head>{0}</head></html>'.format(result)
+        if mode == "head":
+            return f"<html><head>{result}</head></html>"
         else:
-            return u'<html><body>{0}</body></html>'.format(result)
+            return f"<html><body>{result}</body></html>"
 
 
 def FragmentTileCacheRuleFactory(obj):
-    from z3c.caching.registry import ICacheRule
     from z3c.caching.registry import CacheRule
+    from z3c.caching.registry import ICacheRule
 
     noLongerProvides(obj, IFragmentTileCacheRuleLookup)
     try:
@@ -248,7 +249,7 @@ def FragmentTileCacheRuleFactory(obj):
         except (TypeError, AttributeError):
             default = None
     try:
-        fragment = obj.context.data['fragment']
+        fragment = obj.context.data["fragment"]
     except (AttributeError, KeyError):
         fragment = getFragmentName(getRequest())
 
@@ -263,7 +264,7 @@ def FragmentTileCacheRuleFactory(obj):
     if not themeDirectory:
         return default
 
-    rulesets = getFragmentsSettings(themeDirectory, 'themefragments:caching')
+    rulesets = getFragmentsSettings(themeDirectory, "themefragments:caching")
     if not rulesets:
         return default
 
@@ -278,27 +279,27 @@ def getFragmentName(request):
     # 1) fragment name is serialized as 'fragment' by default, but
     #    until plone.app.tiles' forms prefix it with tiletype
     fragment = request.form.get(
-        'fragment', request.form.get(
-            'collective.themefragments.fragment.fragment'))
+        "fragment", request.form.get("collective.themefragments.fragment.fragment")
+    )
     # 2) because fragment is Choice, it may be a list
     if fragment and isinstance(fragment, list):
         fragment = fragment[0]
     # 3) during widget traversal, there's no querystring with fragment
     #    and a convention of prefixing fields with fragment is used
     if not fragment:
-        prefix = '++widget++collective.themefragments.'
-        last = request.getURL().split('/')[-1]
+        prefix = "++widget++collective.themefragments."
+        last = request.getURL().split("/")[-1]
         if last.startswith(prefix):
-            fragment = last[len(prefix):].split('.')[0]
-    return safe_unicode(fragment)
+            fragment = last[len(prefix) :].split(".")[0]
+    return safe_text(fragment)
 
 
 class PrefixedGroup(Group):
-    prefix = ''
+    prefix = ""
 
     def updateWidgets(self, prefix=None):
         prefix = prefix or self.parentForm.widgetPrefix
-        super(PrefixedGroup, self).updateWidgets(prefix=prefix)
+        super().updateWidgets(prefix=prefix)
 
 
 class FragmentTileAddForm(DefaultAddForm):
@@ -318,21 +319,19 @@ class FragmentTileAddForm(DefaultAddForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
-            if six.PY2 and isinstance(fragment, six.text_type):
-                fragment = fragment.encode('utf8')
-            prefix = 'collective.themefragments.' + fragment
+            prefix = "collective.themefragments." + fragment
         return prefix
 
     def updateWidgets(self, prefix=None):
         Form.updateWidgets(self, prefix=self.widgetPrefix)
-        self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
-        self.widgets['fragment'].update()
+        self.widgets["fragment"].name = self.tileType.__name__ + ".fragment"
+        self.widgets["fragment"].update()
 
         # Ensure fragment value
-        if not self.widgets['fragment'].value:
+        if not self.widgets["fragment"].value:
             fragment = getFragmentName(self.request)
             if fragment:
-                self.widgets['fragment'].value = [fragment]
+                self.widgets["fragment"].value = [fragment]
 
 
 class FragmentTileEditForm(DefaultEditForm):
@@ -352,21 +351,19 @@ class FragmentTileEditForm(DefaultEditForm):
         prefix = self.tileType.__name__
         fragment = getFragmentName(self.request)
         if fragment:
-            if six.PY2 and isinstance(fragment, six.text_type):
-                fragment = fragment.encode('utf8')
-            prefix = 'collective.themefragments.' + fragment
+            prefix = "collective.themefragments." + fragment
         return prefix
 
     def updateWidgets(self, prefix=None):
         Form.updateWidgets(self, prefix=self.widgetPrefix)
-        self.widgets['fragment'].name = self.tileType.__name__ + '.fragment'
-        self.widgets['fragment'].update()
+        self.widgets["fragment"].name = self.tileType.__name__ + ".fragment"
+        self.widgets["fragment"].update()
 
         # Ensure fragment value
-        if not self.widgets['fragment'].value:
+        if not self.widgets["fragment"].value:
             fragment = getFragmentName(self.request)
             if fragment:
-                self.widgets['fragment'].value = [fragment]
+                self.widgets["fragment"].value = [fragment]
 
 
 class FragmentTileAddView(DefaultAddView):
@@ -398,16 +395,14 @@ def layoutAwareFragmentTileDataStorage(context, request, tile):
 @adapter(ILayoutBehaviorAdaptable, Interface, FragmentTile)
 class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
     def resolve(self, key):
-        name, schema_ = super(
-            LayoutAwareFragmentTileDataStorage, self).resolve(key)
+        name, schema_ = super().resolve(key)
 
         # We need to read the persisted fragment name for the right schema
         fragment = None
-        for el in self.storage.tree.xpath(
-                '//*[contains(@data-tile, "{0}")]'.format(name)):
+        for el in self.storage.tree.xpath(f'//*[contains(@data-tile, "{name}")]'):
             try:
-                data = json.loads(el.get('data-tiledata') or '{}')
-                fragment = data.get('fragment')
+                data = json.loads(el.get("data-tiledata") or "{}")
+                fragment = data.get("fragment")
             except ValueError:
                 pass
             break
@@ -419,14 +414,16 @@ class LayoutAwareFragmentTileDataStorage(LayoutAwareTileDataStorage):
 
 class FragmentTileDataManager(TransientTileDataManager):
     def get(self):
-        data = super(FragmentTileDataManager, self).get()
-        if data and self.key not in self.annotations and 'fragment' in data:
-            fragment = data['fragment']
+        data = super().get()
+        if data and self.key not in self.annotations and "fragment" in data:
+            fragment = data["fragment"]
             for schema_ in getFragmentSchemata(fragment):
                 try:
-                    data.update(decode(self.tile.request.form,
-                                       schema_, missing=True))
-                except (ValueError, UnicodeDecodeError,):
+                    data.update(decode(self.tile.request.form, schema_, missing=True))
+                except (
+                    ValueError,
+                    UnicodeDecodeError,
+                ):
                     pass
         return data
 
@@ -434,15 +431,15 @@ class FragmentTileDataManager(TransientTileDataManager):
 class FragmentTileAbsoluteURL(TransientTileAbsoluteURL):
     @memoize
     def __str__(self):
-        url = super(FragmentTileAbsoluteURL, self).__str__().split('?')[0]
+        url = super().__str__().split("?")[0]
         data = ITileDataManager(self.context).get()
-        if data and 'fragment' in data:
-            fragment = data['fragment']
+        if data and "fragment" in data:
+            fragment = data["fragment"]
             if fragment:
-                if '?' in url:
-                    url += '&fragment=' + fragment
+                if "?" in url:
+                    url += "&fragment=" + fragment
                 else:
-                    url += '?fragment=' + fragment
+                    url += "?fragment=" + fragment
                 for schema_ in getFragmentSchemata(fragment):
-                    url += '&' + encode(data, schema_)
+                    url += "&" + encode(data, schema_)
         return url

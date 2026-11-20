@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
   <!-- Legacy tile registration -->
   <record name="plone.app.tiles">
@@ -8,9 +8,13 @@
   </record>
 
   <!-- Mosaic tile registration -->
-  <records prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
-           interface="plone.app.mosaic.interfaces.ITile" remove="true" />
+  <records interface="plone.app.mosaic.interfaces.ITile"
+           prefix="plone.app.mosaic.app_tiles.collective_themefragments_fragment"
+           remove="true"
+  />
 
-  <record name="plone.app.mosaic.app_tiles.collective.themefragments_fragment.available_actions" remove="true" />
+  <record name="plone.app.mosaic.app_tiles.collective.themefragments_fragment.available_actions"
+          remove="true"
+  />
 
 </registry>

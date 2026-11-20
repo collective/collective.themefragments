@@ -1,32 +1,24 @@
-# -*- coding: utf-8 -*-
 from App.config import getConfiguration
-from six.moves.configparser import ConfigParser
+from configparser import ConfigParser
+from plone.app.theming.interfaces import IThemingPolicy
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.plugins.utils import getPlugins
 from plone.resource.manifest import MANIFEST_FILENAME
 from zope.globalrequest import getRequest
 
-import six
-
-try:
-    from plone.app.theming.interfaces import IThemingPolicy
-    CACHE = True
-except ImportError:
-    CACHE = False
-
 
 def cache(key):
     def wrapper(func):
         def cached(*args, **kwargs):
-            if not CACHE or getConfiguration().debug_mode:
+            if getConfiguration().debug_mode:
                 return func(*args, **kwargs)
 
             request = getRequest()
             policy = IThemingPolicy(request)
             cache_ = policy.getCache()
-            if not hasattr(cache_, 'collective.themefragments'):
-                setattr(cache_, 'collective.themefragments', {})
-            cache_ = getattr(cache_, 'collective.themefragments')
+            if not hasattr(cache_, "collective.themefragments"):
+                setattr(cache_, "collective.themefragments", {})
+            cache_ = getattr(cache_, "collective.themefragments")
 
             if callable(key):
                 key_ = key(*args)
@@ -38,14 +30,15 @@ def cache(key):
             return cache_[key_]
 
         return cached
+
     return wrapper
 
 
-@cache(lambda directory, section: ':'.join([directory.__name__, section]))
+@cache(lambda directory, section: ":".join([directory.__name__, section]))
 def getFragmentsSettings(themeDirectory, section):
-    return getPluginSettings(
-        themeDirectory, plugins=[(section, None)]
-    ).get(section) or {}
+    return (
+        getPluginSettings(themeDirectory, plugins=[(section, None)]).get(section) or {}
+    )
 
 
 # This is copied from p.a.theming.plugins.utils to get properly cached data
@@ -69,10 +62,7 @@ def getPluginSettings(themeDirectory, plugins=None):
         fp = themeDirectory.openFile(MANIFEST_FILENAME)
 
         try:
-            if six.PY2:
-                parser.readfp(fp)
-            else:
-                parser.read_string(fp.read().decode())
+            parser.read_string(fp.read().decode())
             for section in parser.sections():
                 manifestContents[section] = {}
 
@@ -87,6 +77,8 @@ def getPluginSettings(themeDirectory, plugins=None):
 
     pluginSettings = {}
     for name, plugin in plugins:
-        pluginSettings[name] = manifestContents.get("%s:%s" % (THEME_RESOURCE_NAME, name), {})  # noqa
+        pluginSettings[name] = manifestContents.get(
+            f"{THEME_RESOURCE_NAME}:{name}", {}
+        )  # noqa
 
     return pluginSettings

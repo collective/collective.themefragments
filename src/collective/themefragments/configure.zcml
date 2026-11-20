@@ -1,35 +1,37 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    xmlns:i18n="http://namespaces.zope.org/i18n"
-    i18n_domain="collective.themefragments">
+    i18n_domain="collective.themefragments"
+    >
 
   <!-- Theme traverser @@theme-fragment/name -->
   <browser:page
       name="theme-fragment"
       for="*"
-      layer="plone.app.theming.interfaces.IThemingLayer"
       class=".traversal.ThemeFragment"
       permission="zope.Public"
+      layer="plone.app.theming.interfaces.IThemingLayer"
       />
 
   <!-- View traverser ++themefragment++name -->
   <adapter
-      name="themefragment"
-      for="* plone.app.theming.interfaces.IThemingLayer"
       factory=".traversal.ThemeFragmentView"
+      for="*
+           plone.app.theming.interfaces.IThemingLayer"
+      name="themefragment"
       />
 
   <!-- RichTextValue/@@output_relative_to -helper -->
   <browser:page
       name="output_relative_to"
       for="plone.app.textfield.RichTextValue"
-      layer="plone.app.theming.interfaces.IThemingLayer"
       class=".traversal.OutputRelativeToView"
       permission="zope.Public"
+      layer="plone.app.theming.interfaces.IThemingLayer"
       zcml:condition="installed plone.app.textfield"
       />
   <!-- Note: View for RichTextValue cannot be protected,
@@ -39,7 +41,15 @@
   <!-- Tile -->
   <configure zcml:condition="installed plone.tiles">
 
-    <include package="plone.tiles" file="meta.zcml" />
+    <include
+        package="plone.tiles"
+        file="meta.zcml"
+        />
+    <!-- cmf.ModifyPortalContent, when included before Plone -->
+    <include
+        package="Products.CMFCore"
+        file="permissions.zcml"
+        />
 
     <plone:tile
         name="collective.themefragments.fragment"
@@ -53,55 +63,57 @@
         />
 
     <view
-        for=".tiles.FragmentTile"
         factory=".tiles.FragmentTileAbsoluteURL"
-        type="zope.publisher.interfaces.http.IHTTPRequest"
-        permission="zope.Public"
         provides="zope.traversing.browser.interfaces.IAbsoluteURL"
-        />
-
-    <adapter
         for=".tiles.FragmentTile"
-        provides="plone.tiles.interfaces.ITileDataManager"
+        permission="zope.Public"
+        type="zope.publisher.interfaces.http.IHTTPRequest"
+        />
+
+    <adapter
         factory=".tiles.FragmentTileDataManager"
+        provides="plone.tiles.interfaces.ITileDataManager"
+        for=".tiles.FragmentTile"
         />
 
     <adapter
-        for="zope.annotation.interfaces.IAnnotatable
-             zope.publisher.interfaces.browser.IDefaultBrowserLayer
-             plone.tiles.interfaces.ITileType"
-        provides="plone.app.tiles.interfaces.ITileAddView"
         factory=".tiles.FragmentTileAddView"
+        provides="plone.app.tiles.interfaces.ITileAddView"
+        for="zope.annotation.interfaces.IAnnotatable
+             zope.publisher.interfaces.browser.IDefaultBrowserLayer
+             plone.tiles.interfaces.ITileType"
         name="collective.themefragments.fragment"
         zcml:condition="installed plone.app.tiles"
         />
 
     <adapter
+        factory=".tiles.FragmentTileEditView"
+        provides="plone.app.tiles.interfaces.ITileEditView"
         for="zope.annotation.interfaces.IAnnotatable
              zope.publisher.interfaces.browser.IDefaultBrowserLayer
              plone.tiles.interfaces.ITileType"
-        provides="plone.app.tiles.interfaces.ITileEditView"
-        factory=".tiles.FragmentTileEditView"
         name="collective.themefragments.fragment"
         zcml:condition="installed plone.app.tiles"
         />
 
-    <utility factory=".tiles.FragmentSchemaPolicy"
-             name="collective.themefragments" />
+    <utility
+        factory=".tiles.FragmentSchemaPolicy"
+        name="collective.themefragments"
+        />
 
     <adapter factory=".tiles.layoutAwareFragmentTileDataStorage" />
 
     <adapter
-        provides="plone.app.widgets.interfaces.IFieldPermissionChecker"
-        for=".tiles.FragmentTileAddView"
         factory=".tiles.FragmentTilePermissionChecker"
-        zcml:condition="installed plone.app.widgets"/>
+        provides="plone.app.z3cform.interfaces.IFieldPermissionChecker"
+        for=".tiles.FragmentTileAddView"
+        />
 
     <adapter
-        provides="plone.app.widgets.interfaces.IFieldPermissionChecker"
-        for=".tiles.FragmentTileEditView"
         factory=".tiles.FragmentTilePermissionChecker"
-        zcml:condition="installed plone.app.widgets"/>
+        provides="plone.app.z3cform.interfaces.IFieldPermissionChecker"
+        for=".tiles.FragmentTileEditView"
+        />
 
     <utility
         factory=".tiles.ThemeFragmentsTilesVocabularyFactory"
@@ -109,9 +121,9 @@
         />
 
     <adapter
+        factory=".tiles.FragmentTileCacheRuleFactory"
         provides="z3c.caching.registry.ICacheRule"
         for=".tiles.IFragmentTileCacheRuleLookup"
-        factory=".tiles.FragmentTileCacheRuleFactory"
         zcml:condition="installed z3c.caching"
         />
 
@@ -123,8 +135,8 @@
         name="default"
         title="Theme fragment tile"
         description="Add theme fragment tile for Plone Mosaic"
-        directory="profiles/default"
         provides="Products.GenericSetup.interfaces.EXTENSION"
+        directory="profiles/default"
         i18n:attributes="title description"
         />
 
@@ -132,8 +144,8 @@
         name="uninstall"
         title="Theme fragment tile - uninstall"
         description="Remove theme fragment tile for Plone Mosaic"
-        directory="profiles/uninstall"
         provides="Products.GenericSetup.interfaces.EXTENSION"
+        directory="profiles/uninstall"
         i18n:attributes="title description"
         />
   </configure>
