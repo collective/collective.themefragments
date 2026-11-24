@@ -10,7 +10,7 @@ requires = ["setuptools>=68.2,<83", "wheel"]
 
 [project]
 name = "collective.themefragments"
-version = "3.0.0.dev0"
+version = "3.0.0"
 description = "Theme fragments for plone.app.theming"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
